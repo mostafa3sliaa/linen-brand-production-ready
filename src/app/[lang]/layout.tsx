@@ -6,8 +6,8 @@ const cairo = Cairo({ subsets: ['arabic', 'latin'], weight: ['300', '400', '500'
 const outfit = Outfit({ subsets: ['latin'], weight: ['300', '400', '500', '700'], variable: '--font-outfit' })
 
 export const metadata: Metadata = {
-  title: 'مجموعة الكتان الفاخرة | Luxury Linen',
-  description: 'اكتشف مجموعتنا الحصرية من أطقم الكتان. Discover our exclusive linen suits.',
+  title: 'Mitsh | ميتش',
+  description: 'اكتشف مجموعتنا الحصرية من ميتش. Discover our exclusive Mitsh collection.',
 }
 
 export async function generateStaticParams() {
