@@ -12,34 +12,17 @@ export default function Hero({ dict, lang }: any) {
   return (
     <section className={styles.heroSection}>
       <Image
-        src="https://images.unsplash.com/photo-1594938298593-c50f111059f3?auto=format&fit=crop&q=80&w=2000"
+        src="/images/hero.jpg"
         alt="Mitsh Fashion Hero"
         fill
         priority
         className={styles.bgImage}
         sizes="100vw"
       />
-      <div className={styles.overlay} />
+      {/* Overlay removed to show the text in the image clearly */}
       
-      <div className={styles.content}>
-        <motion.h1 
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-          className={styles.title}
-        >
-          {lang === 'ar' ? 'فن الأناقة الصيفية' : 'The Art of Summer Elegance'}
-        </motion.h1>
-        <motion.p 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
-          className={styles.subtitle}
-        >
-          {lang === 'ar' ? 'اكتشف مجموعة الكتان الحصرية' : 'Discover the exclusive linen collection'}
-        </motion.p>
-      </div>
-
+      {/* Text removed because the image already contains the Brand Name and Slogan */}
+      
       <motion.button 
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
