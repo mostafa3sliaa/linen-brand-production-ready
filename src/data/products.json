@@ -1,58 +1,79 @@
 [
   {
-    "id": "model-1",
+    "id": "mitsh-linen-01",
     "name": {
-      "ar": "طقم كتان كلاسيك - الإصدار الأول",
-      "en": "Classic Linen Suit - Edition 1"
+      "ar": "طقم الكتان الكلاسيكي",
+      "en": "Classic Linen Suit"
     },
     "price": 1200,
-    "images": [
-      "https://images.unsplash.com/photo-1593030103066-0094718aeac3?q=80&w=1000&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1594938291221-94f18cbb5660?q=80&w=1000&auto=format&fit=crop"
-    ],
+    "story": {
+      "title": { "ar": "فن البساطة المطلقة", "en": "The Art of Absolute Simplicity" },
+      "description": { "ar": "مستوحى من الخطوط المعمارية الحديثة، صُمم هذا الطقم ليكون القطعة الأساسية في خزانتك الصيفية. قصة واسعة تمنحك إطلالة فخمة دون عناء.", "en": "Inspired by modern architecture, designed to be the staple of your summer wardrobe. A relaxed fit that gives you effortless luxury." },
+      "fabric": { "ar": "100% كتان أوروبي طبيعي، معالج حرارياً لمنع الانكماش.", "en": "100% Natural European Linen, pre-shrunk." },
+      "features": { "ar": ["قصة Oversized مريحة", "ياقة بتصميم ياباني", "جيوب جانبية مخفية"], "en": ["Relaxed Oversized Fit", "Japanese collar design", "Hidden side pockets"] },
+      "care": { "ar": "غسيل بارد منفصل، يُكوى بدرجة حرارة متوسطة وهو رطب.", "en": "Cold gentle machine wash, medium iron while damp." }
+    },
     "variations": [
-      { "color": { "ar": "أبيض", "en": "White", "hex": "#FFFFFF" }, "size": "M", "stock": 10 },
-      { "color": { "ar": "أبيض", "en": "White", "hex": "#FFFFFF" }, "size": "L", "stock": 0 },
-      { "color": { "ar": "أسود", "en": "Black", "hex": "#000000" }, "size": "M", "stock": 5 },
-      { "color": { "ar": "أسود", "en": "Black", "hex": "#000000" }, "size": "L", "stock": 5 },
-      { "color": { "ar": "بيج", "en": "Beige", "hex": "#E5DFD3" }, "size": "XL", "stock": 2 }
+      {
+        "color": { "name": { "ar": "أسود منتصف الليل", "en": "Midnight Black" }, "hex": "#111111" },
+        "sku": "ML-01-BLK",
+        "images": [
+          "https://images.unsplash.com/photo-1617137968427-85924c800a22?auto=format&fit=crop&q=80&w=1200",
+          "https://images.unsplash.com/photo-1617127365659-c47fa864d8bc?auto=format&fit=crop&q=80&w=1200",
+          "https://images.unsplash.com/photo-1592878904946-b3cd8ae243d0?auto=format&fit=crop&q=80&w=1200"
+        ],
+        "sizes": [
+          { "name": "M", "stock": 10 },
+          { "name": "L", "stock": 1 },
+          { "name": "XL", "stock": 0 },
+          { "name": "XXL", "stock": 5 }
+        ]
+      },
+      {
+        "color": { "name": { "ar": "أبيض عاجي", "en": "Ivory White" }, "hex": "#F4F4F0" },
+        "sku": "ML-01-IVR",
+        "images": [
+          "https://images.unsplash.com/photo-1594938291221-94f18cbb5660?auto=format&fit=crop&q=80&w=1200",
+          "https://images.unsplash.com/photo-1593030761757-71fae45fa0e7?auto=format&fit=crop&q=80&w=1200",
+          "https://images.unsplash.com/photo-1532453288672-3a27e9be9efd?auto=format&fit=crop&q=80&w=1200"
+        ],
+        "sizes": [
+          { "name": "M", "stock": 5 },
+          { "name": "L", "stock": 5 },
+          { "name": "XL", "stock": 5 },
+          { "name": "XXL", "stock": 5 }
+        ]
+      }
     ]
   },
   {
-    "id": "model-2",
+    "id": "mitsh-linen-02",
     "name": {
-      "ar": "طقم كتان مودرن - الإصدار الثاني",
-      "en": "Modern Linen Suit - Edition 2"
+      "ar": "الإصدار المطور - بياقة",
+      "en": "The Elevated Edition"
     },
-    "price": 1350,
-    "images": [
-      "https://images.unsplash.com/photo-1592878904946-b3cd8ae243d0?q=80&w=1000&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1617137968427-85924c800a22?q=80&w=1000&auto=format&fit=crop"
-    ],
-    "variations": [
-      { "color": { "ar": "أسود", "en": "Black", "hex": "#000000" }, "size": "M", "stock": 10 },
-      { "color": { "ar": "أسود", "en": "Black", "hex": "#000000" }, "size": "L", "stock": 10 },
-      { "color": { "ar": "بيج", "en": "Beige", "hex": "#E5DFD3" }, "size": "M", "stock": 0 }
-    ]
-  },
-  {
-    "id": "model-3",
-    "name": {
-      "ar": "طقم كتان بريميوم - الإصدار الثالث",
-      "en": "Premium Linen Suit - Edition 3"
+    "price": 1450,
+    "story": {
+      "title": { "ar": "أناقة رسمية بطابع صيفي", "en": "Formal Elegance with a Summer Touch" },
+      "description": { "ar": "يجمع بين الطابع الرسمي والراحة القصوى للكتان. مثالي للمناسبات الصيفية واللقاءات الرسمية بدون التنازل عن راحتك.", "en": "Combines formal aesthetics with the ultimate comfort of linen. Perfect for summer events and formal gatherings." },
+      "fabric": { "ar": "مزيج الكتان والقطن المصري لتقليل التجاعيد بنسبة 40%.", "en": "Linen and Egyptian Cotton blend to reduce wrinkles by 40%." },
+      "features": { "ar": ["ياقة كلاسيكية", "أزرار صدف طبيعي", "حافة مقوسة"], "en": ["Classic collar", "Natural shell buttons", "Curved hem"] },
+      "care": { "ar": "تنظيف جاف أو غسيل بارد جداً.", "en": "Dry clean or cold wash only." }
     },
-    "price": 1500,
-    "images": [
-      "https://images.unsplash.com/photo-1617127365659-c47fa864d8bc?q=80&w=1000&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1593030761757-71fae45fa0e7?q=80&w=1000&auto=format&fit=crop"
-    ],
     "variations": [
-      { "color": { "ar": "أبيض", "en": "White", "hex": "#FFFFFF" }, "size": "M", "stock": 10 },
-      { "color": { "ar": "أبيض", "en": "White", "hex": "#FFFFFF" }, "size": "L", "stock": 10 },
-      { "color": { "ar": "أسود", "en": "Black", "hex": "#000000" }, "size": "M", "stock": 10 },
-      { "color": { "ar": "أسود", "en": "Black", "hex": "#000000" }, "size": "L", "stock": 10 },
-      { "color": { "ar": "بيج", "en": "Beige", "hex": "#E5DFD3" }, "size": "M", "stock": 10 },
-      { "color": { "ar": "بيج", "en": "Beige", "hex": "#E5DFD3" }, "size": "L", "stock": 10 }
+      {
+        "color": { "name": { "ar": "بيج رملي", "en": "Sand Beige" }, "hex": "#D8C9B9" },
+        "sku": "ML-02-SND",
+        "images": [
+          "https://images.unsplash.com/photo-1598532163257-ae3c6b2524b6?auto=format&fit=crop&q=80&w=1200",
+          "https://images.unsplash.com/photo-1507680434267-3256b1070ff2?auto=format&fit=crop&q=80&w=1200"
+        ],
+        "sizes": [
+          { "name": "M", "stock": 15 },
+          { "name": "L", "stock": 10 },
+          { "name": "XL", "stock": 2 }
+        ]
+      }
     ]
   }
 ]

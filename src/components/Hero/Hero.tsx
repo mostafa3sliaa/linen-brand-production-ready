@@ -1,32 +1,55 @@
+"use client";
 import Image from 'next/image';
+import { motion } from 'framer-motion';
+import { ArrowDown } from 'lucide-react';
 import styles from './Hero.module.css';
 
-export default function Hero({ dict, lang }: { dict: any, lang: string }) {
+export default function Hero({ dict, lang }: any) {
+  const scrollToProducts = () => {
+    document.getElementById('collection')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   return (
-    <section className={styles.hero}>
-      <div className={styles.imageWrapper}>
-        <Image 
-          src="https://images.unsplash.com/photo-1594938298593-c50f111059f3?q=80&w=2000&auto=format&fit=crop" 
-          alt="Hero"
-          fill
-          priority
-          className={styles.image}
-        />
-        <div className={styles.overlay}></div>
-      </div>
+    <section className={styles.heroSection}>
+      <Image
+        src="https://images.unsplash.com/photo-1594938298593-c50f111059f3?auto=format&fit=crop&q=80&w=2000"
+        alt="Mitsh Fashion Hero"
+        fill
+        priority
+        className={styles.bgImage}
+        sizes="100vw"
+      />
+      <div className={styles.overlay} />
       
       <div className={styles.content}>
-        <h1 className={styles.title}>{dict.title}</h1>
-        <p className={styles.subtitle}>{dict.subtitle}</p>
-        <button 
-          className={styles.ctaButton} 
-          onClick={() => {
-            document.getElementById('order-section')?.scrollIntoView({ behavior: 'smooth' });
-          }}
+        <motion.h1 
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+          className={styles.title}
         >
-          {dict.cta}
-        </button>
+          {lang === 'ar' ? 'فن الأناقة الصيفية' : 'The Art of Summer Elegance'}
+        </motion.h1>
+        <motion.p 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+          className={styles.subtitle}
+        >
+          {lang === 'ar' ? 'اكتشف مجموعة الكتان الحصرية' : 'Discover the exclusive linen collection'}
+        </motion.p>
       </div>
+
+      <motion.button 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1, delay: 1 }}
+        className={styles.scrollBtn}
+        onClick={scrollToProducts}
+        aria-label="Scroll to collection"
+      >
+        <ArrowDown size={32} />
+      </motion.button>
     </section>
   );
 }

@@ -1,167 +1,214 @@
-.orderSection {
-  padding: var(--spacing-xl) var(--spacing-sm);
-  background-color: var(--color-beige);
-}
-
-.container {
-  max-width: 800px;
-  margin: 0 auto;
-  background-color: var(--color-white);
-  padding: var(--spacing-lg) var(--spacing-md);
-  box-shadow: 0 20px 40px rgba(0,0,0,0.05);
-}
-
-.formHeader {
-  text-align: center;
-  margin-bottom: var(--spacing-lg);
-}
-
-.title {
-  margin-bottom: var(--spacing-xs);
-  font-weight: 500;
-}
-
-.subtitle {
-  color: var(--color-dark-gray);
-  font-size: 0.875rem;
-}
-
-.form {
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  z-index: 100;
   display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
 }
 
-.productSelectionBox {
-  padding: 1.5rem;
-  background-color: #fafafa;
-  border: 1px solid var(--color-border);
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.flexRow {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-@media (min-width: 600px) {
-  .flexRow {
-    flex-direction: row;
-  }
-  .flexRow > * {
-    flex: 1;
-  }
-}
-
-.fieldGroup {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.fieldGroup label {
-  font-weight: 500;
-  font-size: 0.875rem;
-}
-
-.form input, .form select, .form textarea {
-  padding: 1rem;
-  border: 1px solid var(--color-border);
+/* RTL pushes drawer to left, LTR to right, handled by parent page or framer motion x axis */
+.drawer {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+  max-width: 480px;
   background: var(--color-white);
-  font-family: inherit;
-  font-size: 1rem;
-  transition: border-color 0.3s;
+  box-shadow: var(--shadow-lg);
+  padding: var(--space-8) var(--space-6);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
 }
 
-.form input:focus, .form select:focus, .form textarea:focus {
+html[dir="rtl"] .drawer {
+  left: 0;
+}
+
+html[dir="ltr"] .drawer {
+  right: 0;
+}
+
+.closeBtn {
+  position: absolute;
+  top: var(--space-4);
+  inset-inline-end: var(--space-4);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: var(--space-2);
+  color: var(--color-dark-grey);
+  transition: color var(--transition-fast);
+}
+
+.closeBtn:hover {
+  color: var(--color-black);
+}
+
+.formContainer {
+  margin-top: var(--space-8);
+}
+
+.header {
+  margin-bottom: var(--space-6);
+}
+
+.header h2 {
+  font-size: var(--text-2xl);
+  font-weight: 300;
+  margin-bottom: var(--space-2);
+}
+
+.orderSummary {
+  font-size: var(--text-sm);
+  color: var(--color-dark-grey);
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.progress {
+  display: flex;
+  gap: 4px;
+  margin-bottom: var(--space-8);
+}
+
+.step {
+  height: 2px;
+  flex: 1;
+  background: var(--color-light-grey);
+  transition: background var(--transition-normal);
+}
+
+.activeStep {
+  background: var(--color-black);
+}
+
+.stepContent h3 {
+  font-size: var(--text-lg);
+  margin-bottom: var(--space-6);
+  font-weight: 400;
+}
+
+.inputGroup {
+  margin-bottom: var(--space-4);
+  display: flex;
+  flex-direction: column;
+}
+
+.inputGroup input {
+  padding: var(--space-4);
+  border: 1px solid var(--color-light-grey);
+  font-size: var(--text-base);
+  transition: border-color var(--transition-fast);
+  background: var(--color-off-white);
+  border-radius: var(--radius-none);
+}
+
+.inputGroup input:focus {
   outline: none;
   border-color: var(--color-black);
+  background: var(--color-white);
 }
 
-.errorInput {
-  border-color: var(--color-error);
+.inputError {
+  border-color: var(--color-error) !important;
 }
 
 .errorText {
   color: var(--color-error);
-  font-size: 0.75rem;
+  font-size: var(--text-xs);
+  margin-top: var(--space-1);
 }
 
-.qtyControl {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border: 1px solid var(--color-border);
-  padding: 0.5rem;
-  height: 100%;
-}
-
-.qtyControl button {
-  width: 30px;
-  height: 30px;
-  font-size: 1.25rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--color-light-gray);
-}
-
-.submitBtn {
-  margin-top: 1rem;
+.btnPrimary, .btnSecondary {
   width: 100%;
-  padding: 1.25rem;
-  background-color: var(--color-black);
-  color: var(--color-white);
-  font-size: 1.125rem;
-  font-weight: 700;
+  padding: var(--space-4);
+  font-size: var(--text-base);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
+  margin-top: var(--space-4);
 }
 
-.submitBtn:disabled {
-  background-color: var(--color-dark-gray);
+.btnPrimary {
+  background: var(--color-black);
+  color: var(--color-white);
+  border: 1px solid var(--color-black);
+  transition: background var(--transition-fast);
+}
+
+.btnPrimary:not(:disabled):hover {
+  background: var(--color-dark-grey);
+  border-color: var(--color-dark-grey);
+}
+
+.btnPrimary:disabled {
+  opacity: 0.7;
   cursor: not-allowed;
 }
 
-/* Success Message */
-.successMessage {
-  max-width: 600px;
-  margin: 0 auto;
-  text-align: center;
-  padding: var(--spacing-xl) var(--spacing-md);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
+.btnSecondary {
+  background: var(--color-white);
+  color: var(--color-black);
+  border: 1px solid var(--color-light-grey);
 }
 
-.successIcon {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background-color: var(--color-success);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 3rem;
-  margin-bottom: 1rem;
+.btnSecondary:not(:disabled):hover {
+  border-color: var(--color-black);
 }
 
-/* Loader */
-.loader {
-  width: 24px;
-  height: 24px;
-  border: 3px solid rgba(255, 255, 255, 0.3);
-  border-radius: 50%;
-  border-top-color: white;
-  animation: spin 1s ease-in-out infinite;
+.btnGroup {
+  display: flex;
+  gap: var(--space-4);
+}
+
+.summaryCard {
+  background: var(--color-off-white);
+  padding: var(--space-6);
+  border: 1px solid var(--color-light-grey);
+  margin-bottom: var(--space-6);
+  font-size: var(--text-sm);
+  line-height: 1.8;
+}
+
+.divider {
+  border: none;
+  border-top: 1px solid var(--color-light-grey);
+  margin: var(--space-4) 0;
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.successState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+}
+
+.successIcon {
+  color: var(--color-success);
+  margin-bottom: var(--space-6);
+}
+
+.successState h2 {
+  font-weight: 300;
+  margin-bottom: var(--space-2);
+}
+
+.successState p {
+  color: var(--color-dark-grey);
+  margin-bottom: var(--space-8);
 }

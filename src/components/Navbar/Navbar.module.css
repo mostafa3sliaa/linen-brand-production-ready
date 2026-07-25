@@ -1,0 +1,40 @@
+.navbar {
+  position: fixed;
+  top: 0;
+  inset-inline-start: 0;
+  width: 100vw;
+  height: 80px;
+  z-index: 50;
+  transition: all var(--transition-normal);
+  display: flex;
+  align-items: center;
+}
+
+.scrolled {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--color-light-grey);
+}
+
+.container {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 var(--space-4);
+  display: flex;
+  justify-content: center; /* Center logo like Zara */
+  align-items: center;
+}
+
+.logo {
+  font-size: var(--text-2xl);
+  font-weight: 300;
+  letter-spacing: 0.2em;
+  color: var(--color-white);
+  transition: color var(--transition-normal);
+}
+
+.scrolled .logo {
+  color: var(--color-black);
+}
