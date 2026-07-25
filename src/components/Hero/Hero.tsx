@@ -12,7 +12,7 @@ export default function Hero({ dict, lang }: any) {
   return (
     <section className={styles.heroSection}>
       <Image
-        src="/images/hero.jpg"
+        src="/images/hero-main.jpg"
         alt="Mitsh Fashion Hero"
         fill
         priority

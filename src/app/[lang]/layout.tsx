@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Cairo, Outfit } from 'next/font/google'
+import '@/styles/design-tokens.css'
 import '../globals.css'
 
 const cairo = Cairo({ subsets: ['arabic', 'latin'], weight: ['300', '400', '500', '700'], variable: '--font-cairo' })
