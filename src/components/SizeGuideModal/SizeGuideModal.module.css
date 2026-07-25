@@ -1,0 +1,45 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  inset-inline-start: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 1rem;
+}
+
+.modal {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  background: var(--color-white);
+  padding: 2rem 1rem 1rem 1rem;
+}
+
+.closeBtn {
+  position: absolute;
+  top: 0;
+  inset-inline-end: 0;
+  width: 40px;
+  height: 40px;
+  font-size: 2rem;
+  line-height: 1;
+  color: var(--color-black);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.imageContainer {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4/5;
+}
+
+.image {
+  object-fit: contain;
+}

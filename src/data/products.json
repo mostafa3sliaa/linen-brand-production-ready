@@ -1,0 +1,58 @@
+[
+  {
+    "id": "model-1",
+    "name": {
+      "ar": "طقم كتان كلاسيك - الإصدار الأول",
+      "en": "Classic Linen Suit - Edition 1"
+    },
+    "price": 1200,
+    "images": [
+      "https://images.unsplash.com/photo-1593030103066-0094718aeac3?q=80&w=1000&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1594938291221-94f18cbb5660?q=80&w=1000&auto=format&fit=crop"
+    ],
+    "variations": [
+      { "color": { "ar": "أبيض", "en": "White", "hex": "#FFFFFF" }, "size": "M", "stock": 10 },
+      { "color": { "ar": "أبيض", "en": "White", "hex": "#FFFFFF" }, "size": "L", "stock": 0 },
+      { "color": { "ar": "أسود", "en": "Black", "hex": "#000000" }, "size": "M", "stock": 5 },
+      { "color": { "ar": "أسود", "en": "Black", "hex": "#000000" }, "size": "L", "stock": 5 },
+      { "color": { "ar": "بيج", "en": "Beige", "hex": "#E5DFD3" }, "size": "XL", "stock": 2 }
+    ]
+  },
+  {
+    "id": "model-2",
+    "name": {
+      "ar": "طقم كتان مودرن - الإصدار الثاني",
+      "en": "Modern Linen Suit - Edition 2"
+    },
+    "price": 1350,
+    "images": [
+      "https://images.unsplash.com/photo-1592878904946-b3cd8ae243d0?q=80&w=1000&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1617137968427-85924c800a22?q=80&w=1000&auto=format&fit=crop"
+    ],
+    "variations": [
+      { "color": { "ar": "أسود", "en": "Black", "hex": "#000000" }, "size": "M", "stock": 10 },
+      { "color": { "ar": "أسود", "en": "Black", "hex": "#000000" }, "size": "L", "stock": 10 },
+      { "color": { "ar": "بيج", "en": "Beige", "hex": "#E5DFD3" }, "size": "M", "stock": 0 }
+    ]
+  },
+  {
+    "id": "model-3",
+    "name": {
+      "ar": "طقم كتان بريميوم - الإصدار الثالث",
+      "en": "Premium Linen Suit - Edition 3"
+    },
+    "price": 1500,
+    "images": [
+      "https://images.unsplash.com/photo-1617127365659-c47fa864d8bc?q=80&w=1000&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1593030761757-71fae45fa0e7?q=80&w=1000&auto=format&fit=crop"
+    ],
+    "variations": [
+      { "color": { "ar": "أبيض", "en": "White", "hex": "#FFFFFF" }, "size": "M", "stock": 10 },
+      { "color": { "ar": "أبيض", "en": "White", "hex": "#FFFFFF" }, "size": "L", "stock": 10 },
+      { "color": { "ar": "أسود", "en": "Black", "hex": "#000000" }, "size": "M", "stock": 10 },
+      { "color": { "ar": "أسود", "en": "Black", "hex": "#000000" }, "size": "L", "stock": 10 },
+      { "color": { "ar": "بيج", "en": "Beige", "hex": "#E5DFD3" }, "size": "M", "stock": 10 },
+      { "color": { "ar": "بيج", "en": "Beige", "hex": "#E5DFD3" }, "size": "L", "stock": 10 }
+    ]
+  }
+]

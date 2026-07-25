@@ -1,0 +1,54 @@
+{
+  "hero": {
+    "title": "Pure Linen Elegance",
+    "subtitle": "The luxury summer collection. Modern design reflecting your high taste.",
+    "cta": "Order Now"
+  },
+  "products": {
+    "title": "Exclusive Collection",
+    "color": "Color",
+    "size": "Size",
+    "sizeGuide": "Size Guide",
+    "outOfStock": "Out of Stock",
+    "orderNow": "Order Now",
+    "currency": "EGP",
+    "selectSizeFirst": "Please select a size first"
+  },
+  "orderForm": {
+    "title": "Checkout",
+    "subtitle": "Enter your details and we will contact you for confirmation",
+    "product": "Product",
+    "color": "Color",
+    "size": "Size",
+    "quantity": "Quantity",
+    "name": "Full Name *",
+    "namePlaceholder": "John Doe",
+    "phone": "Phone Number *",
+    "phonePlaceholder": "01XXXXXXXXX",
+    "governorate": "Governorate *",
+    "city": "City/Area *",
+    "address": "Detailed Address *",
+    "addressPlaceholder": "Street, Building, Apartment",
+    "notes": "Notes (Optional)",
+    "notesPlaceholder": "Any extra details for delivery...",
+    "submit": "Confirm Order",
+    "submitting": "Submitting...",
+    "successTitle": "Order Received Successfully!",
+    "successMessage": "We will contact you shortly to confirm your order.",
+    "orderNumber": "Your order number is:",
+    "newOrder": "New Order",
+    "selectProduct": "-- Select Product --",
+    "selectOption": "-- Select --"
+  },
+  "validation": {
+    "nameMin": "Name must be at least 3 characters",
+    "phoneInvalid": "Invalid Egyptian phone number",
+    "govRequired": "Governorate is required",
+    "cityRequired": "City is required",
+    "addressRequired": "Detailed address is required",
+    "productRequired": "Please select a product",
+    "colorRequired": "Please select a color",
+    "sizeRequired": "Please select a size",
+    "spamDetected": "Suspicious activity detected, please try again later."
+  }
+}
