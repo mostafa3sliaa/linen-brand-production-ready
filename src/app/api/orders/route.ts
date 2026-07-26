@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { appendOrderToSheet, getOrdersFromSheet } from '@/lib/googleSheets';
 import { sendWhatsAppNotification } from '@/lib/whatsapp';
+import { sendTelegramNotification } from '@/lib/telegram';
 import { saveToQueue } from '@/lib/queue';
 import { orderSchema } from '@/lib/validations';
 
@@ -87,6 +88,9 @@ export async function POST(req: Request) {
       console.error("WhatsApp failed", e);
       await saveToQueue("whatsapp_notification", { orderId, ...data });
     });
+
+    // Telegram Notification
+    sendTelegramNotification(data).catch(e => console.error("Telegram failed", e));
 
     return NextResponse.json({ success: true, orderId }, { status: 201 });
   } catch (error) {
