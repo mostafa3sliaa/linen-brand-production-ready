@@ -4,7 +4,7 @@ import Script from 'next/script';
 export default function PixelScripts() {
   // Hardcoded as requested by user to avoid Vercel configuration
   const fbPixelId = process.env.NEXT_PUBLIC_FB_PIXEL_ID || '1016238482539272';
-  const tiktokPixelId = process.env.NEXT_PUBLIC_TIKTOK_PIXEL_ID;
+  const tiktokPixelId = process.env.NEXT_PUBLIC_TIKTOK_PIXEL_ID || 'D9INTRJC77U820ARL2J0';
 
   return (
     <>
