@@ -9,6 +9,13 @@ import styles from './ProductLanding.module.css';
 // Import JSON data
 import productsData from '@/data/products.json';
 
+declare global {
+  interface Window {
+    fbq?: any;
+    ttq?: any;
+  }
+}
+
 // In a real app we'd fetch by ID. Here we just take the first product.
 const PRODUCT = productsData.products[0];
 
@@ -94,6 +101,13 @@ export default function ProductLanding({ lang }: { lang: string }) {
         price: PRODUCT.price
       }]);
     }
+    
+    // Pixel Event: AddToCart
+    if (typeof window !== 'undefined') {
+      if (window.fbq) window.fbq('track', 'AddToCart', { value: PRODUCT.price, currency: 'EGP' });
+      if (window.ttq) window.ttq.track('AddToCart', { value: PRODUCT.price, currency: 'EGP' });
+    }
+    
     setIsCartOpen(true); // Open drawer on add
   };
 
@@ -144,6 +158,13 @@ export default function ProductLanding({ lang }: { lang: string }) {
 
       if (res.ok) {
         setSubmitted(true);
+        
+        // Pixel Event: Purchase
+        if (typeof window !== 'undefined') {
+          if (window.fbq) window.fbq('track', 'Purchase', { value: cartTotal, currency: 'EGP' });
+          if (window.ttq) window.ttq.track('CompletePayment', { value: cartTotal, currency: 'EGP' });
+        }
+        
         setCart([]); // Empty the cart
       } else {
         alert(isAr ? 'حدث خطأ أثناء إرسال الطلب، يرجى المحاولة مرة أخرى.' : 'Error submitting order, please try again.');

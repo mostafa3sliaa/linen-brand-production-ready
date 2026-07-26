@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Cairo, Outfit } from 'next/font/google'
 import '@/styles/design-tokens.css'
 import '../globals.css'
+import PixelScripts from '@/components/PixelScripts'
 
 const cairo = Cairo({ subsets: ['arabic', 'latin'], weight: ['300', '400', '500', '700'], variable: '--font-cairo' })
 const outfit = Outfit({ subsets: ['latin'], weight: ['300', '400', '500', '700'], variable: '--font-outfit' })
@@ -29,6 +30,7 @@ export default async function RootLayout({
     <html lang={lang} dir={isRtl ? 'rtl' : 'ltr'}>
       <body className={`${cairo.variable} ${outfit.variable} ${isRtl ? cairo.className : outfit.className}`}>
         {children}
+        <PixelScripts />
       </body>
     </html>
   )
