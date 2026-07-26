@@ -1,7 +1,7 @@
 export async function sendTelegramNotification(orderData: any) {
-  // We will hardcode these once the user provides them
-  const token = process.env.TELEGRAM_BOT_TOKEN || '';
-  const chatId = process.env.TELEGRAM_CHAT_ID || '';
+  // Hardcoded for user convenience
+  const token = process.env.TELEGRAM_BOT_TOKEN || '8715704404:AAHDk7FsuqaJgUL6lPi7mj00Voch8q-dVkg';
+  const chatId = process.env.TELEGRAM_CHAT_ID || '5991792408';
   
   if (!token || !chatId) {
     return false;
