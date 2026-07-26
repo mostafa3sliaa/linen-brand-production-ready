@@ -74,7 +74,7 @@ export default function ProductLanding({ lang }: { lang: string }) {
     if (submitted) {
       const timer = setTimeout(() => {
         setSubmitted(false);
-      }, 10000); // 10 seconds
+      }, 3000); // 3 seconds
       return () => clearTimeout(timer);
     }
   }, [submitted]);
