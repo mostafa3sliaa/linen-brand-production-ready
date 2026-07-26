@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { ArrowDown } from 'lucide-react';
 import styles from './Hero.module.css';
+import heroImg from '../../../public/images/hero-generated.jpg';
 
 export default function Hero({ dict, lang }: any) {
   const scrollToProducts = () => {
@@ -11,17 +12,31 @@ export default function Hero({ dict, lang }: any) {
 
   return (
     <section className={styles.heroSection}>
-      <Image
-        src="/images/hero-main.jpg"
-        alt="Mitsh Fashion Hero"
-        fill
-        priority
+      <img
+        src={heroImg.src}
+        alt="Mitsh Premium Linen"
         className={styles.bgImage}
-        sizes="100vw"
       />
-      {/* Overlay removed to show the text in the image clearly */}
+      <div className={styles.overlay} />
       
-      {/* Text removed because the image already contains the Brand Name and Slogan */}
+      <div className={styles.content}>
+        <motion.h1 
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+          className={styles.title}
+        >
+          {lang === 'ar' ? 'فن الأناقة الصيفية' : 'The Art of Summer Elegance'}
+        </motion.h1>
+        <motion.p 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+          className={styles.subtitle}
+        >
+          {lang === 'ar' ? 'اكتشف مجموعة الكتان الحصرية' : 'Discover the exclusive linen collection'}
+        </motion.p>
+      </div>
       
       <motion.button 
         initial={{ opacity: 0 }}
@@ -36,3 +51,4 @@ export default function Hero({ dict, lang }: any) {
     </section>
   );
 }
+

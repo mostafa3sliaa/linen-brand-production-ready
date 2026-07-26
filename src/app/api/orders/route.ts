@@ -53,11 +53,18 @@ export async function POST(req: Request) {
     const date = new Date().toLocaleDateString('en-GB');
     const time = new Date().toLocaleTimeString('en-GB');
     
+    // Format items as a single string for the Excel sheet
+    const itemsString = data.items.map((item: any) => 
+      `${item.productName} - ${item.color} - Size ${item.size} (x${item.quantity})`
+    ).join(' | ');
+
+    const total = data.items.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0) + 50; // Adding 50 for shipping
+
     const rowData = [
       orderId, date, time, 
-      data.customerName, data.phone, data.governorate, data.city, data.address, 
-      data.productName, data.color, data.size, data.quantity, data.notes || "", 
-      "New", data.url || ""
+      data.customerName, data.phone, data.address, 
+      itemsString, total, data.notes || "", 
+      "New"
     ];
 
     // Fire webhook if configured
@@ -93,15 +100,39 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  // Fetch from Google Sheets
   const rows = await getOrdersFromSheet();
-  const headers = rows[0] || [];
-  const orders = rows.slice(1).map((row: any) => {
+  const headers = rows[0] || [
+    "Order ID", "Date", "Time", "Customer Name", "Phone", "Address", "Items", "Total", "Notes", "Status"
+  ];
+  let orders = rows.slice(1).map((row: any) => {
     let order: any = {};
     headers.forEach((h: string, i: number) => {
       order[h] = row[i] || "";
     });
     return order;
   });
+
+  // Fetch from Local Queue (if sheets aren't configured yet)
+  try {
+    const fs = require('fs/promises');
+    const path = require('path');
+    const queueFile = path.join(process.cwd(), 'failed_orders.json');
+    const queueData = await fs.readFile(queueFile, 'utf8');
+    const queue = JSON.parse(queueData);
+    
+    const queuedOrders = queue.map((q: any) => {
+      let order: any = {};
+      headers.forEach((h: string, i: number) => {
+        order[h] = q.payload[i] || "";
+      });
+      return order;
+    });
+
+    orders = [...orders, ...queuedOrders];
+  } catch (err) {
+    // No local queue found, ignore
+  }
 
   return NextResponse.json({ orders });
 }

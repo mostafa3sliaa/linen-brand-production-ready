@@ -1,0 +1,148 @@
+.galleryWrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.mainContainer {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;  /* IE and Edge */
+  width: 100%;
+  aspect-ratio: 3/4;
+  background-color: var(--color-off-white);
+  border-radius: var(--radius-md);
+  position: relative;
+  cursor: zoom-in;
+}
+
+.mainContainer::-webkit-scrollbar {
+  display: none;
+}
+
+.imageItem {
+  flex: 0 0 100%;
+  width: 100%;
+  scroll-snap-align: start;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mainImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.1s ease-out; /* Fast transition for smooth zoom tracking */
+}
+
+/* Pagination for Mobile */
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: -10px; /* Pull up closer to image */
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--color-light-grey);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.activeDot {
+  background-color: var(--color-black);
+  width: 24px;
+  border-radius: 4px;
+}
+
+/* Thumbnails for Desktop */
+.thumbnailList {
+  display: none; /* Hidden on mobile */
+  gap: var(--space-2);
+  overflow-x: auto;
+  padding-bottom: var(--space-2);
+  justify-content: center;
+}
+
+.thumbnailBtn {
+  flex: 0 0 calc(25% - 6px); /* Show 4 thumbs */
+  aspect-ratio: 3/4;
+  border: 2px solid transparent;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  cursor: pointer;
+  padding: 0;
+  transition: border-color 0.3s;
+}
+
+.thumbnailBtn img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.activeThumb {
+  border-color: var(--color-black);
+}
+
+/* Desktop Overrides */
+@media (min-width: 768px) {
+  .pagination {
+    display: none;
+  }
+  .thumbnailList {
+    display: flex;
+  }
+}
+
+/* Fullscreen Mode */
+.fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: var(--color-white);
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.fullscreen .mainContainer {
+  height: 100vh;
+  aspect-ratio: auto;
+  border-radius: 0;
+  cursor: default;
+}
+
+.fullscreen .mainImage {
+  object-fit: contain;
+}
+
+.closeFullscreen {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 1001;
+  background: rgba(0,0,0,0.5);
+  color: white;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

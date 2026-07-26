@@ -31,10 +31,6 @@
   font-size: var(--text-2xl);
   font-weight: 300;
   letter-spacing: 0.2em;
-  color: var(--color-white);
-  transition: color var(--transition-normal);
-}
-
-.scrolled .logo {
   color: var(--color-black);
+  transition: color var(--transition-normal);
 }

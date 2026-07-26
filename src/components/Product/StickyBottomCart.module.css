@@ -1,0 +1,62 @@
+.stickyBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--color-white);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+  padding: var(--space-4) var(--space-4);
+  z-index: 90; /* below overlay */
+  animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.container {
+  max-width: 1440px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.cartInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.count {
+  font-size: var(--text-sm);
+  color: var(--color-dark-grey);
+}
+
+.price {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--color-black);
+}
+
+.checkoutBtn {
+  background: var(--color-black);
+  color: var(--color-white);
+  border: none;
+  padding: var(--space-3) var(--space-6);
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+  font-size: var(--text-base);
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.checkoutBtn:hover {
+  opacity: 0.9;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+@media (min-width: 768px) {
+  .stickyBar {
+    display: none; /* Only show on mobile as requested */
+  }
+}

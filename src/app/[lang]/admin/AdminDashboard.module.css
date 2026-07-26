@@ -1,0 +1,256 @@
+.container {
+  min-height: 100vh;
+  background-color: #f8f9fa;
+  padding: var(--space-8) var(--space-4);
+  font-family: inherit;
+  direction: rtl;
+}
+
+.wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-6);
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.title {
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  color: var(--color-black);
+  margin: 0;
+}
+
+.secondaryBtn {
+  background: var(--color-white);
+  border: 1px solid var(--color-light-grey);
+  color: var(--color-black);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.secondaryBtn:hover {
+  background: var(--color-light-grey);
+}
+
+.exportBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #115e34;
+  color: white;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: var(--text-sm);
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 10px rgba(17, 94, 52, 0.2);
+}
+
+.exportBtn:hover {
+  background: #0d4626;
+  transform: translateY(-2px);
+}
+
+.card {
+  background: white;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  overflow: hidden;
+  margin-bottom: var(--space-8);
+}
+
+.tableWrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: right;
+  min-width: 900px;
+}
+
+.table th {
+  background: #f1f3f5;
+  color: var(--color-dark-grey);
+  font-weight: 600;
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-sm);
+  border-bottom: 2px solid #e9ecef;
+  white-space: nowrap;
+}
+
+.table td {
+  padding: var(--space-4);
+  border-bottom: 1px solid #e9ecef;
+  color: var(--color-black);
+  font-size: var(--text-sm);
+  vertical-align: top;
+}
+
+.table tr:hover {
+  background: #f8f9fa;
+}
+
+.processedRow td {
+  color: #adb5bd !important;
+  background-color: #fcfcfc;
+}
+
+.orderId {
+  font-weight: 700;
+  color: #115e34;
+}
+
+.processedRow .orderId {
+  color: #adb5bd;
+}
+
+.itemsCol {
+  min-width: 250px;
+  line-height: 1.6;
+}
+
+.totalCol {
+  font-weight: 700;
+}
+
+.statusBadge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  background: #E6F4EA;
+  color: #1E8E3E;
+}
+
+.badgeProcessed {
+  background: #f1f3f5;
+  color: #6c757d;
+}
+
+.actionBtn {
+  display: none;
+}
+
+/* Toggle Switch */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #dee2e6;
+  transition: .3s;
+  border-radius: 24px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .3s;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+input:checked + .slider {
+  background-color: #115e34;
+}
+
+input:checked + .slider:before {
+  transform: translateX(20px);
+}
+
+.loading {
+  text-align: center;
+  padding: var(--space-12);
+  color: var(--color-dark-grey);
+  font-size: var(--text-lg);
+}
+
+.emptyState {
+  text-align: center;
+  padding: var(--space-12);
+  color: var(--color-dark-grey);
+}
+
+/* Password Login Screen */
+.loginContainer {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8f9fa;
+}
+
+.loginCard {
+  background: white;
+  padding: var(--space-8);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  text-align: center;
+  width: 100%;
+  max-width: 400px;
+}
+
+.loginCard h2 {
+  margin-bottom: var(--space-6);
+  color: var(--color-black);
+}
+
+.loginInput {
+  width: 100%;
+  padding: var(--space-3);
+  border: 1px solid var(--color-light-grey);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-4);
+  font-size: var(--text-base);
+  text-align: center;
+}
+
+.loginBtn {
+  width: 100%;
+  padding: var(--space-3);
+  background: var(--color-black);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+  cursor: pointer;
+}

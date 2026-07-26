@@ -1,0 +1,316 @@
+"use client";
+import { useState, useRef, useEffect } from 'react';
+import ImageGallery from './ImageGallery';
+import SizeGuideModal from './SizeGuideModal';
+import MiniCartDrawer from './MiniCartDrawer';
+import StickyBottomCart from './StickyBottomCart';
+import styles from './ProductLanding.module.css';
+
+// Import JSON data
+import productsData from '@/data/products.json';
+
+// In a real app we'd fetch by ID. Here we just take the first product.
+const PRODUCT = productsData.products[0];
+
+type CartItem = {
+  id: string;
+  colorId: string;
+  colorLabel: string;
+  colorImage: string;
+  size: string;
+  quantity: number;
+  price: number;
+};
+
+export default function ProductLanding({ lang }: { lang: string }) {
+  const isAr = lang === 'ar';
+  const [activeColor, setActiveColor] = useState(PRODUCT.colors[0]);
+  const [activeSize, setActiveSize] = useState(PRODUCT.sizes[0]);
+  
+  // Modals / Drawers state
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+
+  // Cart State
+  const [cart, setCart] = useState<CartItem[]>([]);
+
+  // Form State
+  const [formData, setFormData] = useState({ name: '', phone: '', address: '', notes: '' });
+  const [submitted, setSubmitted] = useState(false);
+
+  // Load data from localStorage on mount
+  useEffect(() => {
+    const savedCart = localStorage.getItem('linen_brand_cart');
+    const savedInfo = localStorage.getItem('linen_brand_user_info');
+    
+    if (savedCart) {
+      try { setCart(JSON.parse(savedCart)); } catch (e) {}
+    }
+    if (savedInfo) {
+      try { setFormData(JSON.parse(savedInfo)); } catch (e) {}
+    }
+  }, []);
+
+  // Save cart to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('linen_brand_cart', JSON.stringify(cart));
+  }, [cart]);
+
+  // Save user info to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('linen_brand_user_info', JSON.stringify(formData));
+  }, [formData]);
+
+  // Handle success message timeout
+  useEffect(() => {
+    if (submitted) {
+      const timer = setTimeout(() => {
+        setSubmitted(false);
+      }, 10000); // 10 seconds
+      return () => clearTimeout(timer);
+    }
+  }, [submitted]);
+
+  const checkoutRef = useRef<HTMLDivElement>(null);
+
+  const addToCart = () => {
+    const existingIndex = cart.findIndex(
+      item => item.colorId === activeColor.id && item.size === activeSize
+    );
+    
+    if (existingIndex > -1) {
+      const newCart = [...cart];
+      newCart[existingIndex].quantity += 1;
+      setCart(newCart);
+    } else {
+      setCart([...cart, {
+        id: Math.random().toString(36).substr(2, 9),
+        colorId: activeColor.id,
+        colorLabel: isAr ? activeColor.label.ar : activeColor.label.en,
+        colorImage: activeColor.images[0], // Use first image for cart thumbnail
+        size: activeSize,
+        quantity: 1,
+        price: PRODUCT.price
+      }]);
+    }
+    setIsCartOpen(true); // Open drawer on add
+  };
+
+  const updateQuantity = (id: string, delta: number) => {
+    setCart(cart.map(item => {
+      if (item.id === id) {
+        return { ...item, quantity: Math.max(1, item.quantity + delta) };
+      }
+      return item;
+    }));
+  };
+
+  const removeItem = (id: string) => {
+    setCart(cart.filter(item => item.id !== id));
+  };
+
+  const handleCheckoutClick = () => {
+    setIsCartOpen(false);
+    setTimeout(() => {
+      checkoutRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, 300);
+  };
+
+  const handleOrder = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (cart.length === 0) return;
+    
+    try {
+      const payload = {
+        customerName: formData.name,
+        phone: formData.phone,
+        address: formData.address,
+        notes: formData.notes,
+        items: cart.map(item => ({
+          productName: isAr ? PRODUCT.name.ar : PRODUCT.name.en,
+          color: item.colorLabel,
+          size: item.size,
+          quantity: item.quantity,
+          price: item.price
+        }))
+      };
+
+      const res = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (res.ok) {
+        setSubmitted(true);
+        setCart([]); // Empty the cart
+      } else {
+        alert(isAr ? 'حدث خطأ أثناء إرسال الطلب، يرجى المحاولة مرة أخرى.' : 'Error submitting order, please try again.');
+      }
+    } catch (err) {
+      console.error(err);
+      alert(isAr ? 'حدث خطأ غير متوقع.' : 'An unexpected error occurred.');
+    }
+  };
+
+  const cartItemsCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const cartSubtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const cartTotal = cartSubtotal > 0 ? cartSubtotal + PRODUCT.shipping : 0;
+
+  return (
+    <div className={styles.container}>
+      <div className={styles.grid}>
+        
+        <div className={styles.gallerySection}>
+          <ImageGallery 
+            colors={PRODUCT.colors} 
+            activeColorId={activeColor.id} 
+            onColorChange={setActiveColor}
+            isAr={isAr}
+          />
+        </div>
+
+        {/* Right Column: Product Details (First Screen) */}
+        <div className={styles.productDetails}>
+          <h1 className={styles.title}>{isAr ? PRODUCT.name.ar : PRODUCT.name.en}</h1>
+          <p className={styles.price}>{PRODUCT.price} {isAr ? 'جنيه' : 'EGP'}</p>
+          
+          {/* Bullet points under price */}
+          <ul className={styles.featuresList}>
+            {(isAr ? PRODUCT.features.ar : PRODUCT.features.en).map((feature, idx) => (
+              <li key={idx}>✓ {feature}</li>
+            ))}
+          </ul>
+          
+          <div className={styles.section}>
+            <h3 className={styles.sectionTitle}>{isAr ? 'اللون' : 'Color'}: <span>{isAr ? activeColor.label.ar : activeColor.label.en}</span></h3>
+            <div className={styles.colorOptions}>
+              {PRODUCT.colors.map(color => (
+                <button
+                  key={color.id}
+                  onClick={() => setActiveColor(color)}
+                  className={`${styles.colorBtn} ${activeColor.id === color.id ? styles.activeColor : ''}`}
+                  style={{ backgroundColor: color.id === 'black' ? '#000' : color.id === 'white' ? '#fff' : '#d2b48c' }}
+                  aria-label={isAr ? color.label.ar : color.label.en}
+                />
+              ))}
+            </div>
+          </div>
+
+          <div className={styles.section}>
+            <div className={styles.sizeHeader}>
+              <h3 className={styles.sectionTitle}>{isAr ? 'المقاس' : 'Size'}: <span>{activeSize}</span></h3>
+              <button className={styles.sizeGuideBtn} onClick={() => setIsSizeGuideOpen(true)}>
+                📏 {isAr ? 'جدول المقاسات' : 'Size Chart'}
+              </button>
+            </div>
+            <div className={styles.sizeOptions}>
+              {PRODUCT.sizes.map(size => (
+                <button
+                  key={size}
+                  onClick={() => setActiveSize(size)}
+                  className={`${styles.sizeBtn} ${activeSize === size ? styles.activeSize : ''}`}
+                >
+                  {size}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <button className={styles.ctaBtn} onClick={addToCart}>
+            {isAr ? 'أضف إلى الطلب' : 'Add to Cart'}
+          </button>
+        </div>
+
+      </div>
+
+      {/* Checkout Form Section (At the very bottom) */}
+      <div ref={checkoutRef} className={styles.checkoutWrapper}>
+        {cart.length > 0 && !submitted && (
+          <div className={styles.checkoutSection}>
+            <h2 className={styles.checkoutTitle}>{isAr ? 'إتمام الطلب' : 'Complete Order'}</h2>
+            <form onSubmit={handleOrder} className={styles.form}>
+              <input 
+                type="text" 
+                placeholder={isAr ? 'الاسم بالكامل' : 'Full Name'} 
+                required 
+                className={styles.input}
+                value={formData.name}
+                onChange={e => setFormData({...formData, name: e.target.value})}
+              />
+              <input 
+                type="tel" 
+                placeholder={isAr ? 'رقم الموبايل' : 'Phone Number'} 
+                required 
+                className={styles.input}
+                value={formData.phone}
+                onChange={e => setFormData({...formData, phone: e.target.value})}
+              />
+              <textarea 
+                placeholder={isAr ? 'العنوان بالتفصيل (المحافظة، المنطقة، الشارع)' : 'Full Address'} 
+                required 
+                className={styles.textarea}
+                value={formData.address}
+                onChange={e => setFormData({...formData, address: e.target.value})}
+              />
+              <textarea 
+                placeholder={isAr ? 'ملاحظات إضافية (اختياري)' : 'Order Notes (Optional)'} 
+                className={styles.textarea}
+                value={formData.notes}
+                onChange={e => setFormData({...formData, notes: e.target.value})}
+              />
+              
+              <div className={styles.summary}>
+                <div className={styles.summaryTotal}>
+                  <span>{isAr ? 'الإجمالي المطلوب' : 'Total Required'}</span>
+                  <span>{cartTotal} {isAr ? 'ج.م' : 'EGP'}</span>
+                </div>
+              </div>
+
+              <button type="submit" className={styles.ctaBtn}>
+                {isAr ? 'تأكيد الطلب الآن' : 'Confirm Order Now'}
+              </button>
+            </form>
+          </div>
+        )}
+
+        {/* Centered Success Popup */}
+        {submitted && (
+          <div className={styles.successPopupOverlay}>
+            <div className={styles.successPopup}>
+              <div className={styles.successIcon}>✓</div>
+              <h3>{isAr ? 'تم استلام طلبك بنجاح!' : 'Order received successfully!'}</h3>
+              <p>{isAr ? 'سنتواصل معك قريباً لتأكيد الشحن.' : 'We will contact you soon.'}</p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Drawers and Modals */}
+      <MiniCartDrawer 
+        isOpen={isCartOpen}
+        onClose={() => setIsCartOpen(false)}
+        cart={cart}
+        updateQuantity={updateQuantity}
+        removeItem={removeItem}
+        onCheckout={handleCheckoutClick}
+        isAr={isAr}
+      />
+
+      <SizeGuideModal 
+        isOpen={isSizeGuideOpen}
+        onClose={() => setIsSizeGuideOpen(false)}
+        sizeChart={PRODUCT.sizeChart}
+        isAr={isAr}
+      />
+
+      <StickyBottomCart 
+        itemCount={cartItemsCount}
+        totalPrice={cartTotal}
+        onOpenCart={() => setIsCartOpen(true)}
+        isAr={isAr}
+      />
+    </div>
+  );
+}

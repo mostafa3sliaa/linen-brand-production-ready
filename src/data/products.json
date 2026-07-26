@@ -1,79 +1,61 @@
-[
-  {
-    "id": "mitsh-linen-01",
-    "name": {
-      "ar": "طقم الكتان الكلاسيكي",
-      "en": "Classic Linen Suit"
-    },
-    "price": 1200,
-    "story": {
-      "title": { "ar": "فن البساطة المطلقة", "en": "The Art of Absolute Simplicity" },
-      "description": { "ar": "مستوحى من الخطوط المعمارية الحديثة، صُمم هذا الطقم ليكون القطعة الأساسية في خزانتك الصيفية. قصة واسعة تمنحك إطلالة فخمة دون عناء.", "en": "Inspired by modern architecture, designed to be the staple of your summer wardrobe. A relaxed fit that gives you effortless luxury." },
-      "fabric": { "ar": "100% كتان أوروبي طبيعي، معالج حرارياً لمنع الانكماش.", "en": "100% Natural European Linen, pre-shrunk." },
-      "features": { "ar": ["قصة Oversized مريحة", "ياقة بتصميم ياباني", "جيوب جانبية مخفية"], "en": ["Relaxed Oversized Fit", "Japanese collar design", "Hidden side pockets"] },
-      "care": { "ar": "غسيل بارد منفصل، يُكوى بدرجة حرارة متوسطة وهو رطب.", "en": "Cold gentle machine wash, medium iron while damp." }
-    },
-    "variations": [
-      {
-        "color": { "name": { "ar": "أسود منتصف الليل", "en": "Midnight Black" }, "hex": "#111111" },
-        "sku": "ML-01-BLK",
-        "images": [
-          "https://images.unsplash.com/photo-1617137968427-85924c800a22?auto=format&fit=crop&q=80&w=1200",
-          "https://images.unsplash.com/photo-1617127365659-c47fa864d8bc?auto=format&fit=crop&q=80&w=1200",
-          "https://images.unsplash.com/photo-1592878904946-b3cd8ae243d0?auto=format&fit=crop&q=80&w=1200"
+{
+  "products": [
+    {
+      "id": "premium-summer-linen-suit",
+      "name": {
+        "ar": "طقم كتان صيفي بريميوم",
+        "en": "Premium Summer Linen Suit"
+      },
+      "price": 650,
+      "shipping": 50,
+      "features": {
+        "ar": [
+          "خامة كتان Premium",
+          "خفيف ومناسب للصيف",
+          "متوفر بـ 3 ألوان (أسود، بيج، أبيض)",
+          "مقاسات حتى 6XL"
         ],
-        "sizes": [
-          { "name": "M", "stock": 10 },
-          { "name": "L", "stock": 1 },
-          { "name": "XL", "stock": 0 },
-          { "name": "XXL", "stock": 5 }
+        "en": [
+          "Premium Linen Material",
+          "Lightweight & Summer-ready",
+          "Available in Black, Beige, White",
+          "Sizes up to 6XL"
         ]
       },
-      {
-        "color": { "name": { "ar": "أبيض عاجي", "en": "Ivory White" }, "hex": "#F4F4F0" },
-        "sku": "ML-01-IVR",
-        "images": [
-          "https://images.unsplash.com/photo-1594938291221-94f18cbb5660?auto=format&fit=crop&q=80&w=1200",
-          "https://images.unsplash.com/photo-1593030761757-71fae45fa0e7?auto=format&fit=crop&q=80&w=1200",
-          "https://images.unsplash.com/photo-1532453288672-3a27e9be9efd?auto=format&fit=crop&q=80&w=1200"
-        ],
-        "sizes": [
-          { "name": "M", "stock": 5 },
-          { "name": "L", "stock": 5 },
-          { "name": "XL", "stock": 5 },
-          { "name": "XXL", "stock": 5 }
-        ]
+      "colors": [
+        {
+          "id": "black",
+          "label": { "ar": "أسود", "en": "Black" },
+          "images": [
+            "/images/black-suit.jpg"
+          ]
+        },
+        {
+          "id": "beige",
+          "label": { "ar": "بيج", "en": "Beige" },
+          "images": [
+            "/images/beige-suit.jpg"
+          ]
+        },
+        {
+          "id": "white",
+          "label": { "ar": "أبيض", "en": "White" },
+          "images": [
+            "/images/white-suit.jpg"
+          ]
+        }
+      ],
+      "sizes": ["M", "L", "XL", "2XL", "3XL", "4XL", "5XL", "6XL"],
+      "sizeChart": {
+        "M": { "shirtWidth": 52, "shirtLength": 68, "sleeve": 61, "pantsLength": 98, "weight": "من 50 كيلو الى 60 كيلو" },
+        "L": { "shirtWidth": 54, "shirtLength": 70, "sleeve": 62, "pantsLength": 99, "weight": "من 60 كيلو الى 70 كيلو" },
+        "XL": { "shirtWidth": 56, "shirtLength": 70, "sleeve": 63, "pantsLength": 100, "weight": "من 70 كيلو الى 80 كيلو" },
+        "2XL": { "shirtWidth": 58, "shirtLength": 72, "sleeve": 63, "pantsLength": 100, "weight": "من 80 كيلو الى 90 كيلو" },
+        "3XL": { "shirtWidth": 60, "shirtLength": 72, "sleeve": 64, "pantsLength": 102, "weight": "من 90 كيلو الى 100 كيلو" },
+        "4XL": { "shirtWidth": 62, "shirtLength": 75, "sleeve": 65, "pantsLength": 102, "weight": "من 100 كيلو الى 110 كيلو" },
+        "5XL": { "shirtWidth": 65, "shirtLength": 76, "sleeve": 66, "pantsLength": 104, "weight": "من 110 كيلو الى 115 كيلو" },
+        "6XL": { "shirtWidth": 69, "shirtLength": 78, "sleeve": 68, "pantsLength": 106, "weight": "من 115 كيلو الى 125 كيلو" }
       }
-    ]
-  },
-  {
-    "id": "mitsh-linen-02",
-    "name": {
-      "ar": "الإصدار المطور - بياقة",
-      "en": "The Elevated Edition"
-    },
-    "price": 1450,
-    "story": {
-      "title": { "ar": "أناقة رسمية بطابع صيفي", "en": "Formal Elegance with a Summer Touch" },
-      "description": { "ar": "يجمع بين الطابع الرسمي والراحة القصوى للكتان. مثالي للمناسبات الصيفية واللقاءات الرسمية بدون التنازل عن راحتك.", "en": "Combines formal aesthetics with the ultimate comfort of linen. Perfect for summer events and formal gatherings." },
-      "fabric": { "ar": "مزيج الكتان والقطن المصري لتقليل التجاعيد بنسبة 40%.", "en": "Linen and Egyptian Cotton blend to reduce wrinkles by 40%." },
-      "features": { "ar": ["ياقة كلاسيكية", "أزرار صدف طبيعي", "حافة مقوسة"], "en": ["Classic collar", "Natural shell buttons", "Curved hem"] },
-      "care": { "ar": "تنظيف جاف أو غسيل بارد جداً.", "en": "Dry clean or cold wash only." }
-    },
-    "variations": [
-      {
-        "color": { "name": { "ar": "بيج رملي", "en": "Sand Beige" }, "hex": "#D8C9B9" },
-        "sku": "ML-02-SND",
-        "images": [
-          "https://images.unsplash.com/photo-1598532163257-ae3c6b2524b6?auto=format&fit=crop&q=80&w=1200",
-          "https://images.unsplash.com/photo-1507680434267-3256b1070ff2?auto=format&fit=crop&q=80&w=1200"
-        ],
-        "sizes": [
-          { "name": "M", "stock": 15 },
-          { "name": "L", "stock": 10 },
-          { "name": "XL", "stock": 2 }
-        ]
-      }
-    ]
-  }
-]
+    }
+  ]
+}

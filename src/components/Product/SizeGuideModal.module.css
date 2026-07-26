@@ -1,0 +1,115 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 200;
+  animation: fadeIn 0.3s ease;
+}
+
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 800px;
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  z-index: 201;
+  box-shadow: var(--shadow-lg);
+  animation: slideUp 0.3s ease;
+  overflow: hidden;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  padding: var(--space-4) var(--space-6);
+  border-bottom: 1px solid var(--color-light-grey);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--color-off-white);
+}
+
+.header h3 {
+  margin: 0;
+  font-size: var(--text-lg);
+  color: var(--color-black);
+}
+
+.closeBtn {
+  font-size: 24px;
+  color: var(--color-dark-grey);
+  transition: color 0.2s;
+}
+
+.closeBtn:hover {
+  color: var(--color-error);
+}
+
+.content {
+  padding: var(--space-6);
+  overflow-y: auto;
+}
+
+.tableWrapper {
+  overflow-x: auto;
+}
+
+.sizeTable {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+  font-size: var(--text-sm);
+}
+
+.sizeTable th {
+  background: var(--color-off-white);
+  padding: var(--space-3);
+  color: var(--color-dark-grey);
+  font-weight: 700;
+  border-bottom: 2px solid var(--color-light-grey);
+  white-space: nowrap;
+}
+
+.sizeTable td {
+  padding: var(--space-3);
+  border-bottom: 1px solid var(--color-light-grey);
+  color: var(--color-black);
+}
+
+.sizeTable td:first-child {
+  font-weight: bold;
+  background: var(--color-off-white);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translate(-50%, -45%); }
+  to { opacity: 1; transform: translate(-50%, -50%); }
+}
+
+/* Mobile Bottom Sheet override */
+@media (max-width: 768px) {
+  .modal {
+    top: auto;
+    bottom: 0;
+    transform: translate(-50%, 0);
+    width: 100%;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    animation: slideUpMobile 0.3s ease;
+  }
+  
+  @keyframes slideUpMobile {
+    from { transform: translate(-50%, 100%); }
+    to { transform: translate(-50%, 0); }
+  }
+}
