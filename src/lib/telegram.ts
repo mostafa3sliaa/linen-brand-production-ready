@@ -1,9 +1,9 @@
 export async function sendTelegramNotification(orderData: any) {
   // Hardcoded for user convenience
   const token = process.env.TELEGRAM_BOT_TOKEN || '8715704404:AAHDk7FsuqaJgUL6lPi7mj00Voch8q-dVkg';
-  const chatId = process.env.TELEGRAM_CHAT_ID || '5991792408';
+  const chatIds = ['5991792408', '680736426'];
   
-  if (!token || !chatId) {
+  if (!token) {
     return false;
   }
 
@@ -30,22 +30,19 @@ ${itemsString}
   `;
 
   try {
-    const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        chat_id: chatId,
-        text: text,
-        parse_mode: 'Markdown',
-      }),
-    });
-    
-    if (!response.ok) {
-        console.error("Telegram error:", await response.text());
-        return false;
-    }
+    await Promise.all(chatIds.map(chatId =>
+      fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: text,
+          parse_mode: 'Markdown',
+        }),
+      })
+    ));
     return true;
   } catch (error) {
     console.error("Telegram fetch error:", error);
