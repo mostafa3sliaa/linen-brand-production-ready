@@ -384,6 +384,11 @@ input:checked + .slider:before {
   background: #0d4626;
 }
 
+.copiedBtn {
+  background: #495057 !important;
+  cursor: default;
+}
+
 .actionCell {
   display: flex;
   align-items: center;

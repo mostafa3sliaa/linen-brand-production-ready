@@ -8,6 +8,7 @@ export default function AdminDashboard() {
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [viewOrder, setViewOrder] = useState<any | null>(null);
+  const [copied, setCopied] = useState(false);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -180,7 +181,10 @@ export default function AdminDashboard() {
           <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalHeader}>
               <h3 className={styles.modalTitle}>تفاصيل الطلب</h3>
-              <button className={styles.closeBtn} onClick={() => setViewOrder(null)}>×</button>
+              <button className={styles.closeBtn} onClick={() => {
+                setViewOrder(null);
+                setCopied(false);
+              }}>×</button>
             </div>
             
             <div className={styles.orderPreviewBox}>
@@ -189,14 +193,15 @@ export default function AdminDashboard() {
 
             <div className={styles.modalActions}>
               <button 
-                className={styles.copyBtn} 
+                className={`${styles.copyBtn} ${copied ? styles.copiedBtn : ''}`} 
                 onClick={() => {
                   const text = `🛒 *طلب جديد (New Order!)* 🛒\n\n👤 *الاسم:* ${viewOrder['Customer Name']}\n📱 *الموبايل:* ${viewOrder['Phone']}\n📍 *العنوان:* ${viewOrder['Address']}\n\n📦 *المنتجات:*\n${viewOrder['Items'] ? viewOrder['Items'].split(' | ').map((i: string) => `- ${i}`).join('\n') : '-'}\n\n💰 *الإجمالي:* ${viewOrder['Total']} EGP\n\n📝 *ملاحظات:* ${viewOrder['Notes'] || 'لا يوجد'}`;
                   navigator.clipboard.writeText(text);
-                  alert('تم نسخ تفاصيل الطلب بنجاح! 📋');
+                  setCopied(true);
+                  setTimeout(() => setCopied(false), 2000);
                 }}
               >
-                📋 نسخ الطلب
+                {copied ? '✔️ تم النسخ' : '📋 نسخ الطلب'}
               </button>
             </div>
           </div>
