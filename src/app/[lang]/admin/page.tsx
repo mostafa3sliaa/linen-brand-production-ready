@@ -7,6 +7,7 @@ export default function AdminDashboard() {
   const [password, setPassword] = useState('');
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [viewOrder, setViewOrder] = useState<any | null>(null);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -150,14 +151,19 @@ export default function AdminDashboard() {
                         </span>
                       </td>
                       <td>
-                        <label className={styles.switch}>
-                          <input 
-                            type="checkbox" 
-                            checked={order['Status'] === 'Processed'}
-                            onChange={(e) => updateStatus([order['Order ID']], e.target.checked ? 'Processed' : 'New')}
-                          />
-                          <span className={styles.slider}></span>
-                        </label>
+                        <div className={styles.actionCell}>
+                          <label className={styles.switch}>
+                            <input 
+                              type="checkbox" 
+                              checked={order['Status'] === 'Processed'}
+                              onChange={(e) => updateStatus([order['Order ID']], e.target.checked ? 'Processed' : 'New')}
+                            />
+                            <span className={styles.slider}></span>
+                          </label>
+                          <button onClick={() => setViewOrder(order)} className={styles.viewBtn}>
+                            عرض ونسخ
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -166,8 +172,36 @@ export default function AdminDashboard() {
             </div>
           )}
         </div>
-
       </div>
+
+      {/* Order Preview Modal */}
+      {viewOrder && (
+        <div className={styles.modalOverlay} onClick={() => setViewOrder(null)}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h3 className={styles.modalTitle}>تفاصيل الطلب</h3>
+              <button className={styles.closeBtn} onClick={() => setViewOrder(null)}>×</button>
+            </div>
+            
+            <div className={styles.orderPreviewBox}>
+              {`🛒 *طلب جديد (New Order!)* 🛒\n\n👤 *الاسم:* ${viewOrder['Customer Name']}\n📱 *الموبايل:* ${viewOrder['Phone']}\n📍 *العنوان:* ${viewOrder['Address']}\n\n📦 *المنتجات:*\n${viewOrder['Items'] ? viewOrder['Items'].split(' | ').map((i: string) => `- ${i}`).join('\n') : '-'}\n\n💰 *الإجمالي:* ${viewOrder['Total']} EGP\n\n📝 *ملاحظات:* ${viewOrder['Notes'] || 'لا يوجد'}`}
+            </div>
+
+            <div className={styles.modalActions}>
+              <button 
+                className={styles.copyBtn} 
+                onClick={() => {
+                  const text = `🛒 *طلب جديد (New Order!)* 🛒\n\n👤 *الاسم:* ${viewOrder['Customer Name']}\n📱 *الموبايل:* ${viewOrder['Phone']}\n📍 *العنوان:* ${viewOrder['Address']}\n\n📦 *المنتجات:*\n${viewOrder['Items'] ? viewOrder['Items'].split(' | ').map((i: string) => `- ${i}`).join('\n') : '-'}\n\n💰 *الإجمالي:* ${viewOrder['Total']} EGP\n\n📝 *ملاحظات:* ${viewOrder['Notes'] || 'لا يوجد'}`;
+                  navigator.clipboard.writeText(text);
+                  alert('تم نسخ تفاصيل الطلب بنجاح! 📋');
+                }}
+              >
+                📋 نسخ الطلب
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -292,3 +292,117 @@ input:checked + .slider:before {
   font-weight: 700;
   cursor: pointer;
 }
+
+/* Modal Styles */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.modalContent {
+  background: white;
+  width: 90%;
+  max-width: 500px;
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+  position: relative;
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-light-grey);
+  padding-bottom: var(--space-3);
+}
+
+.modalTitle {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  margin: 0;
+  color: var(--color-black);
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: var(--color-dark-grey);
+}
+
+.orderPreviewBox {
+  background: #f8f9fa;
+  padding: var(--space-4);
+  border-radius: var(--radius-sm);
+  border: 1px solid #e9ecef;
+  font-family: inherit;
+  white-space: pre-wrap;
+  direction: rtl;
+  font-size: 15px;
+  line-height: 1.6;
+  max-height: 400px;
+  overflow-y: auto;
+  color: #333;
+}
+
+.modalActions {
+  display: flex;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+}
+
+.copyBtn {
+  flex: 1;
+  background: #115e34;
+  color: white;
+  border: none;
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--text-base);
+  transition: all 0.2s;
+}
+
+.copyBtn:hover {
+  background: #0d4626;
+}
+
+.actionCell {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.viewBtn {
+  background: none;
+  border: 1px solid #115e34;
+  color: #115e34;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 12px;
+  transition: all 0.2s;
+}
+
+.viewBtn:hover {
+  background: #115e34;
+  color: white;
+}
