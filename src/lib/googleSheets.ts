@@ -71,8 +71,8 @@ export async function updateOrderStatus(orderId: string, status: string) {
     
     if (rowIndex === -1) return false;
 
-    // Assuming Status is column N
-    const range = `Orders!N${rowIndex + 1}`; 
+    // Status is column J (10th column)
+    const range = `Orders!J${rowIndex + 1}`; 
 
     await sheets.spreadsheets.values.update({
       spreadsheetId,
