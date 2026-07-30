@@ -94,6 +94,21 @@ export default function AdminDashboard() {
           </a>
         </div>
 
+        <div className={styles.statsContainer}>
+          <div className={styles.statCard}>
+            <span className={styles.statLabel}>إجمالي الطلبات</span>
+            <span className={styles.statValue}>{orders.length}</span>
+          </div>
+          <div className={`${styles.statCard} ${styles.new}`}>
+            <span className={styles.statLabel}>الطلبات الجديدة</span>
+            <span className={styles.statValue}>{orders.filter(o => o['Status'] === 'New').length}</span>
+          </div>
+          <div className={`${styles.statCard} ${styles.processed}`}>
+            <span className={styles.statLabel}>تم التسليم (مقروء)</span>
+            <span className={styles.statValue}>{orders.filter(o => o['Status'] === 'Processed').length}</span>
+          </div>
+        </div>
+
         <div className={styles.card}>
           {loading ? (
             <div className={styles.loading}>جاري تحميل الطلبات...</div>
