@@ -198,7 +198,10 @@ export default function AdminDashboard() {
                   const text = `🛒 *طلب جديد (New Order!)* 🛒\n\n👤 *الاسم:* ${viewOrder['Customer Name']}\n📱 *الموبايل:* ${viewOrder['Phone']}\n📍 *العنوان:* ${viewOrder['Address']}\n\n📦 *المنتجات:*\n${viewOrder['Items'] ? viewOrder['Items'].split(' | ').map((i: string) => `- ${i}`).join('\n') : '-'}\n\n💰 *الإجمالي:* ${viewOrder['Total']} EGP\n\n📝 *ملاحظات:* ${viewOrder['Notes'] || 'لا يوجد'}`;
                   navigator.clipboard.writeText(text);
                   setCopied(true);
-                  setTimeout(() => setCopied(false), 2000);
+                  setTimeout(() => {
+                    setCopied(false);
+                    setViewOrder(null);
+                  }, 2000);
                 }}
               >
                 {copied ? '✔️ تم النسخ' : '📋 نسخ الطلب'}
