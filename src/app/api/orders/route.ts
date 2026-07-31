@@ -84,13 +84,13 @@ export async function POST(req: Request) {
     }
     
     // WhatsApp Notification
-    sendWhatsAppNotification({ orderId, ...data }).catch(async (e) => {
+    await sendWhatsAppNotification({ orderId, ...data }).catch(async (e) => {
       console.error("WhatsApp failed", e);
       await saveToQueue("whatsapp_notification", { orderId, ...data });
     });
 
     // Telegram Notification
-    sendTelegramNotification(data).catch(e => console.error("Telegram failed", e));
+    await sendTelegramNotification(data).catch(e => console.error("Telegram failed", e));
 
     return NextResponse.json({ success: true, orderId }, { status: 201 });
   } catch (error) {
