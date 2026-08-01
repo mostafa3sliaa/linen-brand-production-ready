@@ -26,6 +26,7 @@
         {
           "id": "black",
           "label": { "ar": "أسود", "en": "Black" },
+          "hex": "#000000",
           "images": [
             "/images/black-suit.jpg"
           ]
@@ -33,6 +34,7 @@
         {
           "id": "beige",
           "label": { "ar": "بيج", "en": "Beige" },
+          "hex": "#e5d3b3",
           "images": [
             "/images/beige-suit.jpg"
           ]
@@ -40,6 +42,7 @@
         {
           "id": "white",
           "label": { "ar": "أبيض", "en": "White" },
+          "hex": "#ffffff",
           "images": [
             "/images/white-suit.jpg"
           ]
