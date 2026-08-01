@@ -19,6 +19,9 @@ type Props = {
   removeItem: (id: string) => void;
   onCheckout: () => void;
   isAr: boolean;
+  colors?: any[];
+  sizes?: string[];
+  onAdd?: (color: any, size: string) => void;
 };
 
 export default function MiniCartDrawer({
@@ -28,12 +31,25 @@ export default function MiniCartDrawer({
   updateQuantity,
   removeItem,
   onCheckout,
-  isAr
+  isAr,
+  colors,
+  sizes,
+  onAdd
 }: Props) {
+  const [showQuickAdd, setShowQuickAdd] = useState(false);
+  const [selectedColor, setSelectedColor] = useState<any>(null);
+  const [selectedSize, setSelectedSize] = useState<string>('');
+
+  useEffect(() => {
+    if (colors && colors.length > 0) setSelectedColor(colors[0]);
+    if (sizes && sizes.length > 0) setSelectedSize(sizes[0]);
+  }, [colors, sizes]);
+
   // Prevent body scroll when open
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
+      setShowQuickAdd(false); // Reset on open
     } else {
       document.body.style.overflow = 'unset';
     }
@@ -45,6 +61,13 @@ export default function MiniCartDrawer({
   const total = subtotal > 0 ? subtotal + shipping : 0;
 
   if (!isOpen && cart.length === 0) return null; // Fully unmount if empty and closed to save DOM
+
+  const handleQuickAdd = () => {
+    if (onAdd && selectedColor && selectedSize) {
+      onAdd(selectedColor, selectedSize);
+      setShowQuickAdd(false);
+    }
+  };
 
   return (
     <>
@@ -90,6 +113,37 @@ export default function MiniCartDrawer({
               </div>
             ))
           )}
+
+          {showQuickAdd && colors && sizes && (
+            <div className={styles.quickAddSection}>
+              <h4>{isAr ? 'اختر اللون والمقاس الجديد' : 'Select new color and size'}</h4>
+              <div className={styles.qaColors}>
+                {colors.map(c => (
+                  <button 
+                    key={c.id} 
+                    className={`${styles.qaColorBtn} ${selectedColor?.id === c.id ? styles.qaColorActive : ''}`}
+                    onClick={() => setSelectedColor(c)}
+                  >
+                    <span style={{ backgroundColor: c.hex }}></span>
+                  </button>
+                ))}
+              </div>
+              <div className={styles.qaSizes}>
+                {sizes.map(s => (
+                  <button 
+                    key={s} 
+                    className={`${styles.qaSizeBtn} ${selectedSize === s ? styles.qaSizeActive : ''}`}
+                    onClick={() => setSelectedSize(s)}
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+              <button className={styles.qaConfirmBtn} onClick={handleQuickAdd}>
+                {isAr ? 'إضافة للسلة' : 'Add to Cart'}
+              </button>
+            </div>
+          )}
         </div>
 
         {cart.length > 0 && (
@@ -110,9 +164,11 @@ export default function MiniCartDrawer({
             <button className={styles.checkoutBtn} onClick={onCheckout}>
               {isAr ? 'إتمام الطلب' : 'Checkout Now'}
             </button>
-            <button className={styles.continueShoppingBtn} onClick={onClose}>
-              {isAr ? 'إضافة لون أو مقاس آخر' : 'Add another color or size'}
-            </button>
+            {!showQuickAdd && (
+              <button className={styles.continueShoppingBtn} onClick={() => setShowQuickAdd(true)}>
+                {isAr ? 'إضافة لون أو مقاس آخر' : 'Add another color or size'}
+              </button>
+            )}
           </div>
         )}
       </div>

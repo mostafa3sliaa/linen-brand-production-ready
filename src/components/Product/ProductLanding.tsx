@@ -81,9 +81,9 @@ export default function ProductLanding({ lang }: { lang: string }) {
 
   const checkoutRef = useRef<HTMLDivElement>(null);
 
-  const addToCart = () => {
+  const addToCart = (color = activeColor, size = activeSize) => {
     const existingIndex = cart.findIndex(
-      item => item.colorId === activeColor.id && item.size === activeSize
+      item => item.colorId === color.id && item.size === size
     );
     
     if (existingIndex > -1) {
@@ -93,10 +93,10 @@ export default function ProductLanding({ lang }: { lang: string }) {
     } else {
       setCart([...cart, {
         id: Math.random().toString(36).substr(2, 9),
-        colorId: activeColor.id,
-        colorLabel: isAr ? activeColor.label.ar : activeColor.label.en,
-        colorImage: activeColor.images[0], // Use first image for cart thumbnail
-        size: activeSize,
+        colorId: color.id,
+        colorLabel: isAr ? color.label.ar : color.label.en,
+        colorImage: color.images[0], // Use first image for cart thumbnail
+        size: size,
         quantity: 1,
         price: PRODUCT.price
       }]);
@@ -317,6 +317,9 @@ export default function ProductLanding({ lang }: { lang: string }) {
         removeItem={removeItem}
         onCheckout={handleCheckoutClick}
         isAr={isAr}
+        colors={PRODUCT.colors}
+        sizes={PRODUCT.sizes}
+        onAdd={addToCart}
       />
 
       <SizeGuideModal 
