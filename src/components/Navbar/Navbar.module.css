@@ -29,8 +29,23 @@
 
 .logo {
   font-size: var(--text-2xl);
-  font-weight: 300;
-  letter-spacing: 0.2em;
-  color: var(--color-black);
-  transition: color var(--transition-normal);
+  font-weight: 400;
+  letter-spacing: 0.25em;
+  background: linear-gradient(
+    110deg,
+    #000000 35%,
+    #d2b48c 50%,
+    #000000 65%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: logoShine 6s linear infinite;
+  text-transform: uppercase;
+}
+
+@keyframes logoShine {
+  to {
+    background-position: -200% center;
+  }
 }
