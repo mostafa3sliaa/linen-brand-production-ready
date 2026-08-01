@@ -7,7 +7,7 @@ type Color = {
   label: { ar: string; en: string };
   hex: string;
   images: string[];
-  femaleImages?: string[];
+  femaleImages: string[];
 };
 
 type Props = {
