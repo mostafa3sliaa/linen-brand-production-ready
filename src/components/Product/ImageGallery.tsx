@@ -5,7 +5,7 @@ import styles from './ImageGallery.module.css';
 type Color = {
   id: string;
   label: { ar: string; en: string };
-  hex?: string;
+  hex: string;
   images: string[];
 };
 
