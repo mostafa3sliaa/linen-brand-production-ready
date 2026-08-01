@@ -31,7 +31,7 @@
             "/images/black-suit.jpg"
           ],
           "femaleImages": [
-            "/images/black-suit-women.jpg"
+            "/images/black-women.jpg"
           ]
         },
         {
@@ -42,7 +42,7 @@
             "/images/beige-suit.jpg"
           ],
           "femaleImages": [
-            "/images/beige-suit-women.jpg"
+            "/images/beige-women.jpg"
           ]
         },
         {
@@ -53,7 +53,7 @@
             "/images/white-suit.jpg"
           ],
           "femaleImages": [
-            "/images/white-suit-women.jpg"
+            "/images/white-women.jpg"
           ]
         }
       ],
