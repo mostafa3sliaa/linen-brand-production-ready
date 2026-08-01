@@ -45,6 +45,7 @@ export default function ProductLanding({ lang }: { lang: string }) {
   // Form State
   const [formData, setFormData] = useState({ name: '', phone: '', address: '', notes: '' });
   const [submitted, setSubmitted] = useState(false);
+  const [lastOrder, setLastOrder] = useState<any>(null);
 
   // Load data from localStorage on mount
   useEffect(() => {
@@ -68,16 +69,6 @@ export default function ProductLanding({ lang }: { lang: string }) {
   useEffect(() => {
     localStorage.setItem('linen_brand_user_info', JSON.stringify(formData));
   }, [formData]);
-
-  // Handle success message timeout
-  useEffect(() => {
-    if (submitted) {
-      const timer = setTimeout(() => {
-        setSubmitted(false);
-      }, 3000); // 3 seconds
-      return () => clearTimeout(timer);
-    }
-  }, [submitted]);
 
   const checkoutRef = useRef<HTMLDivElement>(null);
 
@@ -158,6 +149,11 @@ export default function ProductLanding({ lang }: { lang: string }) {
 
       if (res.ok) {
         setSubmitted(true);
+        setLastOrder({
+          items: cart,
+          shipping: PRODUCT.shipping,
+          total: cartTotal
+        });
         
         // Pixel Event: Purchase
         if (typeof window !== 'undefined') {
@@ -297,12 +293,44 @@ export default function ProductLanding({ lang }: { lang: string }) {
         )}
 
         {/* Centered Success Popup */}
-        {submitted && (
+        {submitted && lastOrder && (
           <div className={styles.successPopupOverlay}>
             <div className={styles.successPopup}>
               <div className={styles.successIcon}>✓</div>
               <h3>{isAr ? 'تم استلام طلبك بنجاح!' : 'Order received successfully!'}</h3>
-              <p>{isAr ? 'سنتواصل معك قريباً لتأكيد الشحن.' : 'We will contact you soon.'}</p>
+              
+              <div className={styles.invoiceBox}>
+                <h4 className={styles.invoiceTitle}>{isAr ? 'تفاصيل الطلب' : 'Order Details'}</h4>
+                <div className={styles.invoiceItems}>
+                  {lastOrder.items.map((item: any, idx: number) => (
+                    <div key={idx} className={styles.invoiceItem}>
+                      <span>{item.quantity}x {item.colorLabel} - {item.size}</span>
+                      <span>{item.price * item.quantity} {isAr ? 'ج.م' : 'EGP'}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className={styles.invoiceDivider}></div>
+                <div className={styles.invoiceRow}>
+                  <span>{isAr ? 'الشحن' : 'Shipping'}</span>
+                  <span>{lastOrder.shipping} {isAr ? 'ج.م' : 'EGP'}</span>
+                </div>
+                <div className={`${styles.invoiceRow} ${styles.invoiceTotal}`}>
+                  <span>{isAr ? 'الإجمالي' : 'Total'}</span>
+                  <span>{lastOrder.total} {isAr ? 'ج.م' : 'EGP'}</span>
+                </div>
+              </div>
+
+              <p className={styles.successNote}>{isAr ? 'سنتواصل معك قريباً لتأكيد الشحن.' : 'We will contact you soon.'}</p>
+              
+              <button 
+                className={styles.closeSuccessBtn} 
+                onClick={() => {
+                  setSubmitted(false);
+                  setLastOrder(null);
+                }}
+              >
+                {isAr ? 'حسناً، العودة للمتجر ❤️' : 'Ok, Return to Store ❤️'}
+              </button>
             </div>
           </div>
         )}
