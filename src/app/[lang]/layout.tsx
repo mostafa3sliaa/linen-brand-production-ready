@@ -34,8 +34,8 @@ export const metadata: Metadata = {
     images: ['https://mitsh.vercel.app/images/hero-main.jpg'],
   },
   icons: {
-    icon: '/icon.jpg?v=2',
-    apple: '/icon.jpg?v=2',
+    icon: 'https://raw.githubusercontent.com/mostafa3sliaa/linen-brand-production-ready/master/public/icon.jpg',
+    apple: 'https://raw.githubusercontent.com/mostafa3sliaa/linen-brand-production-ready/master/public/icon.jpg',
   }
 }
 
