@@ -84,33 +84,39 @@ export default function ProductLanding({ lang }: { lang: string }) {
   const checkoutRef = useRef<HTMLDivElement>(null);
 
   const addToCart = (color = activeColor, size = activeSize) => {
-    const existingIndex = cart.findIndex(
-      item => item.colorId === color.id && item.size === size
-    );
+    if (!color || !size) return;
+    const existingItem = cart.find(item => item.id === `${color.id}-${size}-${gender}`);
     
-    if (existingIndex > -1) {
-      const newCart = [...cart];
-      newCart[existingIndex].quantity += 1;
-      setCart(newCart);
+    if (existingItem) {
+      updateQuantity(existingItem.id, existingItem.quantity + 1);
     } else {
-      setCart([...cart, {
-        id: Math.random().toString(36).substr(2, 9),
+      const itemImage = gender === 'women' && color.femaleImages ? color.femaleImages[0] : color.images[0];
+      const newItem = {
+        id: `${color.id}-${size}-${gender}`,
+        productName: isAr ? PRODUCT.name.ar : PRODUCT.name.en,
         colorId: color.id,
         colorLabel: isAr ? color.label.ar : color.label.en,
-        colorImage: color.images[0], // Use first image for cart thumbnail
-        size: size,
+        size,
+        price: PRODUCT.price,
         quantity: 1,
-        price: PRODUCT.price
-      }]);
+        colorImage: itemImage,
+        gender: gender
+      };
+      setCart([...cart, newItem]);
     }
-    
+
+    setIsCartOpen(true);
+
     // Pixel Event: AddToCart
     if (typeof window !== 'undefined') {
       if (window.fbq) window.fbq('track', 'AddToCart', { value: PRODUCT.price, currency: 'EGP' });
       if (window.ttq) window.ttq.track('AddToCart', { value: PRODUCT.price, currency: 'EGP' });
     }
     
-    setIsCartOpen(true); // Open drawer on add
+    // Auto-scroll back up slightly for mobile if they clicked from sticky
+    setTimeout(() => {
+      checkoutRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, 300);
   };
 
   const updateQuantity = (id: string, delta: number) => {
