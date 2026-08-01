@@ -73,6 +73,7 @@
 }
 
 .thumbnailBtn {
+  position: relative;
   flex: 0 0 calc(25% - 6px); /* Show 4 thumbs */
   aspect-ratio: 3/4;
   border: 2px solid transparent;
