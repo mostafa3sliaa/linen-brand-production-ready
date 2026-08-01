@@ -340,14 +340,14 @@ export default function ProductLanding({ lang }: { lang: string }) {
                   onClick={submitFinalOrder}
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? (isAr ? 'جاري الإرسال...' : 'Submitting...') : (isAr ? 'تأكيد وإرسال الطلب ✓' : 'Confirm & Submit ✓')}
+                  {isSubmitting ? (isAr ? 'جاري الإرسال...' : 'Submitting...') : (isAr ? 'إتمام الطلب ❤️' : 'Complete Order ❤️')}
                 </button>
                 <button 
                   className={styles.cancelReviewBtn} 
                   onClick={() => setReviewMode(false)}
                   disabled={isSubmitting}
                 >
-                  {isAr ? 'إلغاء وتعديل ✕' : 'Cancel & Edit ✕'}
+                  {isAr ? 'إلغاء الطلب 💔' : 'Cancel Order 💔'}
                 </button>
               </div>
             </div>

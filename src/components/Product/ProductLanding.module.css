@@ -434,9 +434,9 @@
 }
 
 .cancelReviewBtn {
-  background: transparent;
-  color: #d32f2f;
-  border: 1px solid #d32f2f;
+  background: #d32f2f;
+  color: white;
+  border: none;
   padding: var(--space-3) var(--space-6);
   border-radius: var(--radius-sm);
   font-size: var(--text-base);
@@ -447,7 +447,7 @@
 }
 
 .cancelReviewBtn:hover:not(:disabled) {
-  background: #fff5f5;
+  background: #b71c1c;
 }
 
 .cancelReviewBtn:disabled {
