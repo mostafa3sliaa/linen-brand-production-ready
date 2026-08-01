@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import styles from './MiniCartDrawer.module.css';
 
 type CartItem = {
@@ -41,15 +42,19 @@ export default function MiniCartDrawer({
   const [selectedSize, setSelectedSize] = useState<string>('');
 
   useEffect(() => {
-    if (colors && colors.length > 0) setSelectedColor(colors[0]);
-    if (sizes && sizes.length > 0) setSelectedSize(sizes[0]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const timer = setTimeout(() => {
+      if (colors && colors.length > 0 && !selectedColor) setSelectedColor(colors[0]);
+      if (sizes && sizes.length > 0 && !selectedSize) setSelectedSize(sizes[0]);
+    }, 0);
+    return () => clearTimeout(timer);
   }, [colors, sizes]);
 
   // Prevent body scroll when open
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
-      setShowQuickAdd(false); // Reset on open
+      setTimeout(() => setShowQuickAdd(false), 0); // Reset on open
     } else {
       document.body.style.overflow = 'unset';
     }
@@ -90,7 +95,7 @@ export default function MiniCartDrawer({
           ) : (
             cart.map(item => (
               <div key={item.id} className={styles.item}>
-                <img src={item.colorImage} alt={item.colorLabel} className={styles.itemImg} loading="lazy" />
+                <Image src={item.colorImage} alt={item.colorLabel} width={80} height={100} className={styles.itemImg} style={{ objectFit: 'cover' }} />
                 
                 <div className={styles.itemDetails}>
                   <div className={styles.itemTitleRow}>

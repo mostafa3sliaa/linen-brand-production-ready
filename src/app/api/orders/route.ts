@@ -1,4 +1,6 @@
 import { NextResponse } from 'next/server';
+import fs from 'fs/promises';
+import path from 'path';
 import { appendOrderToSheet, getOrdersFromSheet } from '@/lib/googleSheets';
 import { sendWhatsAppNotification } from '@/lib/whatsapp';
 import { sendTelegramNotification } from '@/lib/telegram';
@@ -119,8 +121,6 @@ export async function GET(req: Request) {
 
   // Fetch from Local Queue (if sheets aren't configured yet)
   try {
-    const fs = require('fs/promises');
-    const path = require('path');
     const queueFile = path.join(process.cwd(), 'failed_orders.json');
     const queueData = await fs.readFile(queueFile, 'utf8');
     const queue = JSON.parse(queueData);

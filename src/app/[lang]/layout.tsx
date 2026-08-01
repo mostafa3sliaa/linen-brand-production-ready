@@ -8,10 +8,39 @@ const cairo = Cairo({ subsets: ['arabic', 'latin'], weight: ['300', '400', '500'
 const outfit = Outfit({ subsets: ['latin'], weight: ['300', '400', '500', '700'], variable: '--font-outfit' })
 
 export const metadata: Metadata = {
-  title: 'Mitsh | ميتش',
-  description: 'اكتشف مجموعتنا الحصرية من ميتش. Discover our exclusive Mitsh collection.',
+  title: 'Mitsh | طقم كتان صيفي بريميوم',
+  description: 'اكتشف مجموعتنا الحصرية من ميتش. طقم كتان صيفي بريميوم بأفضل خامة وألوان جذابة.',
+  keywords: 'طقم كتان, ملابس صيفية, ميتش, Mitsh, ملابس رجالي, ملابس حريمي, أطقم كاجوال',
+  openGraph: {
+    title: 'Mitsh | طقم كتان صيفي بريميوم',
+    description: 'طقم كتان صيفي بريميوم بخامة ممتازة وألوان جذابة. اطلب الآن من ميتش!',
+    url: 'https://mitsh.vercel.app',
+    siteName: 'Mitsh',
+    images: [
+      {
+        url: 'https://mitsh.vercel.app/images/hero-main.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Mitsh Summer Collection',
+      }
+    ],
+    locale: 'ar_EG',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Mitsh | ميتش',
+    description: 'طقم كتان صيفي بريميوم بخامة ممتازة وألوان جذابة.',
+    images: ['https://mitsh.vercel.app/images/hero-main.jpg'],
+  }
 }
 
+export const viewport = {
+  themeColor: '#000000',
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+}
 export async function generateStaticParams() {
   return [{ lang: 'ar' }, { lang: 'en' }];
 }

@@ -1,5 +1,6 @@
 "use client";
 import { useState, useRef, MouseEvent, useEffect } from 'react';
+import Image from 'next/image';
 import styles from './ImageGallery.module.css';
 
 type Color = {
@@ -121,13 +122,16 @@ export default function ImageGallery({ colors, activeColorId, onColorChange, isA
             onMouseLeave={handleMouseLeave}
             onClick={() => { if(!isFullscreen && window.innerWidth >= 768) setIsFullscreen(true); }}
           >
-            <img 
-              src={imageSrc} 
-              alt={isAr ? color.label.ar : color.label.en}
-              className={`${styles.mainImage} ${isZooming && safeActiveIndex === idx ? styles.zoomed : ''}`}
-              style={isZooming && safeActiveIndex === idx ? zoomStyle : {}}
-              loading={idx === 0 ? 'eager' : 'lazy'}
-            />
+            <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+              <Image 
+                src={imageSrc} 
+                alt={isAr ? color.label.ar : color.label.en}
+                fill
+                className={`${styles.mainImage} ${isZooming && safeActiveIndex === idx ? styles.zoomed : ''}`}
+                style={{ objectFit: 'cover', ...(isZooming && safeActiveIndex === idx ? zoomStyle : {}) }}
+                priority={idx === 0}
+              />
+            </div>
           </div>
         )})}
       </div>
@@ -155,7 +159,7 @@ export default function ImageGallery({ colors, activeColorId, onColorChange, isA
               className={`${styles.thumbnailBtn} ${safeActiveIndex === idx ? styles.activeThumb : ''}`}
               aria-label={isAr ? color.label.ar : color.label.en}
             >
-              <img src={imageSrc} alt="" loading="lazy" />
+              <Image src={imageSrc} alt="" fill style={{ objectFit: 'cover' }} />
             </button>
             );
           })}

@@ -12,10 +12,13 @@ export default function Hero({ dict, lang }: any) {
 
   return (
     <section className={styles.heroSection}>
-      <img
-        src={heroImg.src}
+      <Image
+        src={heroImg}
         alt="Mitsh Premium Linen"
+        fill
+        priority
         className={styles.bgImage}
+        style={{ objectFit: 'cover' }}
       />
       <div className={styles.overlay} />
       

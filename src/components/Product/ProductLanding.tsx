@@ -53,12 +53,14 @@ export default function ProductLanding({ lang }: { lang: string }) {
     const savedCart = localStorage.getItem('linen_brand_cart');
     const savedInfo = localStorage.getItem('linen_brand_user_info');
     
-    if (savedCart) {
-      try { setCart(JSON.parse(savedCart)); } catch (e) {}
-    }
-    if (savedInfo) {
-      try { setFormData(JSON.parse(savedInfo)); } catch (e) {}
-    }
+    setTimeout(() => {
+      if (savedCart) {
+        try { setCart(JSON.parse(savedCart)); } catch (e) {}
+      }
+      if (savedInfo) {
+        try { setFormData(JSON.parse(savedInfo)); } catch (e) {}
+      }
+    }, 0);
   }, []);
 
   // Save cart to localStorage whenever it changes
@@ -137,6 +139,11 @@ export default function ProductLanding({ lang }: { lang: string }) {
     setTimeout(() => {
       checkoutRef.current?.scrollIntoView({ behavior: 'smooth' });
     }, 300);
+
+    if (typeof window !== 'undefined') {
+      if (window.fbq) window.fbq('track', 'InitiateCheckout', { value: cartTotal, currency: 'EGP' });
+      if (window.ttq) window.ttq.track('InitiateCheckout', { value: cartTotal, currency: 'EGP' });
+    }
   };
 
   const handleOrder = (e: React.FormEvent) => {
