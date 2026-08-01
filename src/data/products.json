@@ -29,6 +29,9 @@
           "hex": "#000000",
           "images": [
             "/images/black-suit.jpg"
+          ],
+          "femaleImages": [
+            "/images/black-suit-women.jpg"
           ]
         },
         {
@@ -37,6 +40,9 @@
           "hex": "#e5d3b3",
           "images": [
             "/images/beige-suit.jpg"
+          ],
+          "femaleImages": [
+            "/images/beige-suit-women.jpg"
           ]
         },
         {
@@ -45,6 +51,9 @@
           "hex": "#ffffff",
           "images": [
             "/images/white-suit.jpg"
+          ],
+          "femaleImages": [
+            "/images/white-suit-women.jpg"
           ]
         }
       ],

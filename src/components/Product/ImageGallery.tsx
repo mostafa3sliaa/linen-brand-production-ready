@@ -7,6 +7,7 @@ type Color = {
   label: { ar: string; en: string };
   hex: string;
   images: string[];
+  femaleImages?: string[];
 };
 
 type Props = {
@@ -14,9 +15,10 @@ type Props = {
   activeColorId: string;
   onColorChange: (color: Color) => void;
   isAr: boolean;
+  gender: 'men' | 'women';
 };
 
-export default function ImageGallery({ colors, activeColorId, onColorChange, isAr }: Props) {
+export default function ImageGallery({ colors, activeColorId, onColorChange, isAr, gender }: Props) {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [zoomStyle, setZoomStyle] = useState({});
   const [isZooming, setIsZooming] = useState(false);
@@ -109,7 +111,9 @@ export default function ImageGallery({ colors, activeColorId, onColorChange, isA
         ref={scrollContainerRef}
         onScroll={handleScroll}
       >
-        {colors.map((color, idx) => (
+        {colors.map((color, idx) => {
+          const imageSrc = gender === 'women' && color.femaleImages ? color.femaleImages[0] : color.images[0];
+          return (
           <div 
             key={color.id} 
             className={styles.imageItem}
@@ -118,14 +122,14 @@ export default function ImageGallery({ colors, activeColorId, onColorChange, isA
             onClick={() => { if(!isFullscreen && window.innerWidth >= 768) setIsFullscreen(true); }}
           >
             <img 
-              src={color.images[0]} 
+              src={imageSrc} 
               alt={isAr ? color.label.ar : color.label.en}
               className={`${styles.mainImage} ${isZooming && safeActiveIndex === idx ? styles.zoomed : ''}`}
               style={isZooming && safeActiveIndex === idx ? zoomStyle : {}}
               loading={idx === 0 ? 'eager' : 'lazy'}
             />
           </div>
-        ))}
+        )})}
       </div>
 
       {/* Pagination dots for Mobile */}
@@ -142,16 +146,19 @@ export default function ImageGallery({ colors, activeColorId, onColorChange, isA
       {/* Thumbnails for Desktop */}
       {!isFullscreen && (
         <div className={styles.thumbnailList}>
-          {colors.map((color, idx) => (
+          {colors.map((color, idx) => {
+            const imageSrc = gender === 'women' && color.femaleImages ? color.femaleImages[0] : color.images[0];
+            return (
             <button 
               key={color.id}
               onClick={() => onColorChange(color)}
               className={`${styles.thumbnailBtn} ${safeActiveIndex === idx ? styles.activeThumb : ''}`}
               aria-label={isAr ? color.label.ar : color.label.en}
             >
-              <img src={color.images[0]} alt="" loading="lazy" />
+              <img src={imageSrc} alt="" loading="lazy" />
             </button>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

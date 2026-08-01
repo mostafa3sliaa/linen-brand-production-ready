@@ -185,6 +185,8 @@ export default function ProductLanding({ lang }: { lang: string }) {
     }
   };
 
+  const [gender, setGender] = useState<'men'|'women'>('men');
+
   const cartItemsCount = cart.reduce((sum, item) => sum + item.quantity, 0);
   const cartSubtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const cartTotal = cartSubtotal > 0 ? cartSubtotal + PRODUCT.shipping : 0;
@@ -199,12 +201,29 @@ export default function ProductLanding({ lang }: { lang: string }) {
             activeColorId={activeColor.id} 
             onColorChange={setActiveColor}
             isAr={isAr}
+            gender={gender}
           />
         </div>
 
         {/* Right Column: Product Details (First Screen) */}
         <div className={styles.productDetails}>
           <h1 className={styles.title}>{isAr ? PRODUCT.name.ar : PRODUCT.name.en}</h1>
+          
+          <div className={styles.genderToggleContainer}>
+            <button 
+              className={`${styles.genderBtn} ${gender === 'men' ? styles.genderBtnActiveMen : ''}`}
+              onClick={() => setGender('men')}
+            >
+              {isAr ? 'رجالي' : "Men's"}
+            </button>
+            <button 
+              className={`${styles.genderBtn} ${gender === 'women' ? styles.genderBtnActiveWomen : ''}`}
+              onClick={() => setGender('women')}
+            >
+              {isAr ? 'حريمي' : "Women's"}
+            </button>
+          </div>
+
           <p className={styles.price}>{PRODUCT.price} {isAr ? 'جنيه' : 'EGP'}</p>
           
           {/* Bullet points under price */}

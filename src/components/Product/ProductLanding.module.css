@@ -454,3 +454,35 @@
   opacity: 0.7;
   cursor: not-allowed;
 }
+
+/* Gender Toggle Styles */
+.genderToggleContainer {
+  display: flex;
+  margin: var(--space-3) 0 var(--space-4) 0;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid #e9ecef;
+  background: #f8f9fa;
+}
+
+.genderBtn {
+  flex: 1;
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--color-dark-grey);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.genderBtnActiveMen {
+  background: #1971c2; /* Blue */
+  color: white;
+}
+
+.genderBtnActiveWomen {
+  background: #d6336c; /* Pink */
+  color: white;
+}
