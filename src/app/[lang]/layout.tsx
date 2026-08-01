@@ -32,6 +32,10 @@ export const metadata: Metadata = {
     title: 'Mitsh | ميتش',
     description: 'طقم كتان صيفي بريميوم بخامة ممتازة وألوان جذابة.',
     images: ['https://mitsh.vercel.app/images/hero-main.jpg'],
+  },
+  icons: {
+    icon: '/icon.jpg?v=2',
+    apple: '/icon.jpg?v=2',
   }
 }
 
