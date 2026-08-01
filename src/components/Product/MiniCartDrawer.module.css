@@ -222,20 +222,20 @@
 .continueShoppingBtn {
   width: 100%;
   padding: var(--space-3);
-  background: transparent;
-  color: var(--color-black);
+  background: #f9f6f0;
+  color: #5c4d3c;
   font-weight: 600;
   font-size: var(--text-sm);
   border-radius: var(--radius-sm);
   transition: all 0.3s ease;
-  border: 1px solid var(--color-light-grey);
+  border: 1px solid #e2d5c1;
   cursor: pointer;
   margin-top: var(--space-3);
 }
 
 .continueShoppingBtn:hover {
-  background: var(--color-off-white);
-  border-color: var(--color-dark-grey);
+  background: #e8dbcb;
+  border-color: #d1bda2;
 }
 
 .quickAddSection {
