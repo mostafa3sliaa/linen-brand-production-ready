@@ -239,7 +239,7 @@ export default function ProductLanding({ lang }: { lang: string }) {
             </div>
           </div>
 
-          <button className={styles.ctaBtn} onClick={addToCart}>
+          <button className={styles.ctaBtn} onClick={() => addToCart()}>
             {isAr ? 'أضف إلى الطلب' : 'Add to Cart'}
           </button>
         </div>
