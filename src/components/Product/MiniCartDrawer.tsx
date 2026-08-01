@@ -110,6 +110,9 @@ export default function MiniCartDrawer({
             <button className={styles.checkoutBtn} onClick={onCheckout}>
               {isAr ? 'إتمام الطلب' : 'Checkout Now'}
             </button>
+            <button className={styles.continueShoppingBtn} onClick={onClose}>
+              {isAr ? 'إضافة لون أو مقاس آخر' : 'Add another color or size'}
+            </button>
           </div>
         )}
       </div>
