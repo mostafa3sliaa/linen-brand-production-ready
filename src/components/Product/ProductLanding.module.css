@@ -417,6 +417,40 @@
   transition: background 0.3s;
 }
 
-.closeSuccessBtn:hover {
+.closeSuccessBtn:hover:not(:disabled) {
   background: #0d4626;
+}
+
+.closeSuccessBtn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.reviewActions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.cancelReviewBtn {
+  background: transparent;
+  color: #d32f2f;
+  border: 1px solid #d32f2f;
+  padding: var(--space-3) var(--space-6);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-base);
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  transition: all 0.3s;
+}
+
+.cancelReviewBtn:hover:not(:disabled) {
+  background: #fff5f5;
+}
+
+.cancelReviewBtn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
