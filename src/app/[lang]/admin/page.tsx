@@ -122,7 +122,7 @@ export default function AdminDashboard() {
               تحديد الكل كـ مقروء ✓
             </button>
           </div>
-          <a href="/api/orders/export" className={styles.exportBtn} download>
+          <a href={`/api/orders/export${filterDate !== 'All' ? `?date=${encodeURIComponent(filterDate)}` : ''}`} className={styles.exportBtn} download>
             <span>📥</span> تحميل ملف إكسيل
           </a>
         </div>

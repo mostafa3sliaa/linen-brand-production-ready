@@ -39,6 +39,16 @@ export async function GET(req: Request) {
       // Ignore if no local queue
     }
 
+    // Filter by date if provided in query string
+    const { searchParams } = new URL(req.url);
+    const filterDate = searchParams.get('date');
+    if (filterDate) {
+      orders = orders.filter((o: any) => {
+        const dateTime = o['التاريخ والوقت'] || '';
+        return dateTime.startsWith(filterDate);
+      });
+    }
+
     // 3. Convert to CSV format (Excel compatible)
     // UTF-8 BOM is required for Excel to read Arabic characters correctly
     const BOM = '\uFEFF';
