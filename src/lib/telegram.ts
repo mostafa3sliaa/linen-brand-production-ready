@@ -16,7 +16,7 @@ export async function sendTelegramNotification(orderData: any) {
 
   const text = `الاسم: ${orderData.customerName}
 الموبايل: ${orderData.phone}
-المحافظة: 
+المحافظة: ${orderData.governorate}
 العنوان: ${orderData.address}
 الشحن: 50
 ملاحظات: ${orderData.notes || ""}

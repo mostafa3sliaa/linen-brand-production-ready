@@ -43,7 +43,7 @@ export default function ProductLanding({ lang }: { lang: string }) {
   const [cart, setCart] = useState<CartItem[]>([]);
 
   // Form State
-  const [formData, setFormData] = useState({ name: '', phone: '', address: '', notes: '' });
+  const [formData, setFormData] = useState({ name: '', phone: '', governorate: '', address: '', notes: '' });
   const [reviewMode, setReviewMode] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -158,6 +158,7 @@ export default function ProductLanding({ lang }: { lang: string }) {
       const payload = {
         customerName: formData.name,
         phone: formData.phone,
+        governorate: formData.governorate,
         address: formData.address,
         notes: formData.notes,
         items: cart.map(item => ({
@@ -186,7 +187,7 @@ export default function ProductLanding({ lang }: { lang: string }) {
         }
         
         setCart([]); // Empty the cart
-        setFormData({ name: '', phone: '', address: '', notes: '' });
+        setFormData({ name: '', phone: '', governorate: '', address: '', notes: '' });
       } else {
         alert(isAr ? 'حدث خطأ أثناء إرسال الطلب، يرجى المحاولة مرة أخرى.' : 'Error submitting order, please try again.');
       }
@@ -310,8 +311,16 @@ export default function ProductLanding({ lang }: { lang: string }) {
                 value={formData.phone}
                 onChange={e => setFormData({...formData, phone: e.target.value})}
               />
+              <input 
+                type="text" 
+                placeholder={isAr ? 'المحافظة' : 'Governorate'} 
+                required 
+                className={styles.input}
+                value={formData.governorate}
+                onChange={e => setFormData({...formData, governorate: e.target.value})}
+              />
               <textarea 
-                placeholder={isAr ? 'العنوان بالتفصيل (المحافظة، المنطقة، الشارع)' : 'Full Address'} 
+                placeholder={isAr ? 'العنوان التفصيلي (المنطقة، الشارع، رقم العمارة، الشقة)' : 'Detailed Address'} 
                 required 
                 className={styles.textarea}
                 value={formData.address}
