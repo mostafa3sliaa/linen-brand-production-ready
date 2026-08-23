@@ -56,19 +56,27 @@ export async function POST(req: Request) {
     const date = new Date().toLocaleDateString('en-GB');
     const time = new Date().toLocaleTimeString('en-GB');
     
-    // Format items as a single string for the Excel sheet
     const itemsString = data.items.map((item: any) => 
       `${item.productName.replace('طقم كتان صيفي بريميوم', 'كتان')} ${item.color} مقاس ${item.size} الكمية ${item.quantity} السعر ${item.price}`
     ).join('\n');
 
+    const productsTotal = data.items.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0);
+    const shippingFee = 50;
+    const finalTotal = productsTotal + shippingFee;
+
     const rowData = [
+      orderId, 
+      `${date} ${time}`,
       data.customerName,
       data.phone,
       data.governorate,
       data.address,
       itemsString,
-      50, // Shipping fee
-      data.notes || ""
+      productsTotal,
+      shippingFee,
+      finalTotal,
+      data.notes || "",
+      "New" // الحالة
     ];
 
     // Fire webhook if configured

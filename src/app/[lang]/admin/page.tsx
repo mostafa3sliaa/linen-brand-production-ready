@@ -34,6 +34,31 @@ export default function AdminDashboard() {
     setLoading(false);
   };
 
+  const updateStatus = async (orderIds: string[], status: string) => {
+    try {
+      const res = await fetch('/api/orders/status', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderIds, status })
+      });
+      if (res.ok) {
+        // Update local state
+        setOrders(orders.map(o => 
+          orderIds.includes(o['رقم الطلب']) ? { ...o, 'الحالة': status } : o
+        ));
+      }
+    } catch (err) {
+      console.error("Failed to update status", err);
+    }
+  };
+
+  const markAllProcessed = () => {
+    const newOrderIds = orders.filter(o => o['الحالة'] === 'New').map(o => o['رقم الطلب']);
+    if (newOrderIds.length > 0) {
+      updateStatus(newOrderIds, 'Processed');
+    }
+  };
+
   if (!isAuthenticated) {
     return (
       <div className={styles.loginContainer} dir="rtl">
@@ -61,6 +86,9 @@ export default function AdminDashboard() {
         <div className={styles.header}>
           <div className={styles.headerLeft}>
             <h1 className={styles.title}>الطلبات الواردة</h1>
+            <button onClick={markAllProcessed} className={styles.secondaryBtn}>
+              تحديد الكل كـ مقروء ✓
+            </button>
           </div>
           <a href="/api/orders/export" className={styles.exportBtn} download>
             <span>📥</span> تحميل ملف إكسيل
@@ -71,6 +99,14 @@ export default function AdminDashboard() {
           <div className={styles.statCard}>
             <span className={styles.statLabel}>إجمالي الطلبات</span>
             <span className={styles.statValue}>{orders.length}</span>
+          </div>
+          <div className={`${styles.statCard} ${styles.new}`}>
+            <span className={styles.statLabel}>الطلبات الجديدة</span>
+            <span className={styles.statValue}>{orders.filter(o => o['الحالة'] === 'New').length}</span>
+          </div>
+          <div className={`${styles.statCard} ${styles.processed}`}>
+            <span className={styles.statLabel}>تم التسليم (مقروء)</span>
+            <span className={styles.statValue}>{orders.filter(o => o['الحالة'] === 'Processed').length}</span>
           </div>
         </div>
 
@@ -84,19 +120,26 @@ export default function AdminDashboard() {
               <table className={styles.table}>
                 <thead>
                   <tr>
+                    <th>رقم الطلب</th>
+                    <th>التاريخ والوقت</th>
                     <th>اسم العميل</th>
                     <th>رقم الموبايل</th>
                     <th>المحافظة</th>
                     <th>العنوان التفصيلي</th>
                     <th>المنتجات المطلوبة</th>
+                    <th>سعر المنتجات</th>
                     <th>الشحن</th>
+                    <th>الإجمالي الكلي</th>
                     <th>ملاحظات</th>
+                    <th>الحالة</th>
                     <th>إجراء</th>
                   </tr>
                 </thead>
                 <tbody>
                   {orders.map((order, idx) => (
-                    <tr key={idx}>
+                    <tr key={idx} className={order['الحالة'] === 'Processed' ? styles.processedRow : ''}>
+                      <td className={styles.orderId}>{order['رقم الطلب'] || '-'}</td>
+                      <td>{order['التاريخ والوقت']}</td>
                       <td>{order['اسم العميل']}</td>
                       <td dir="ltr" style={{textAlign: 'right'}}>{order['رقم الهاتف']}</td>
                       <td>{order['المحافظة']}</td>
@@ -104,10 +147,25 @@ export default function AdminDashboard() {
                       <td className={styles.itemsCol} style={{ whiteSpace: 'pre-line' }}>
                         {order['المنتجات']}
                       </td>
-                      <td>{order['مصاريف الشحن']}</td>
+                      <td>{order['إجمالي المنتجات']} ج.م</td>
+                      <td>{order['مصاريف الشحن']} ج.م</td>
+                      <td className={styles.totalCol}>{order['الإجمالي الكلي']} ج.م</td>
                       <td>{order['ملاحظات']}</td>
                       <td>
+                        <span className={`${styles.statusBadge} ${order['الحالة'] === 'Processed' ? styles.badgeProcessed : ''}`}>
+                          {order['الحالة'] === 'Processed' ? 'تم' : 'جديد'}
+                        </span>
+                      </td>
+                      <td>
                         <div className={styles.actionCell}>
+                          <label className={styles.switch}>
+                            <input 
+                              type="checkbox" 
+                              checked={order['الحالة'] === 'Processed'}
+                              onChange={(e) => updateStatus([order['رقم الطلب']], e.target.checked ? 'Processed' : 'New')}
+                            />
+                            <span className={styles.slider}></span>
+                          </label>
                           <button onClick={() => setViewOrder(order)} className={styles.viewBtn}>
                             عرض ونسخ
                           </button>
@@ -135,14 +193,14 @@ export default function AdminDashboard() {
             </div>
             
             <div className={styles.orderPreviewBox}>
-              {`الاسم: ${viewOrder['اسم العميل']}\nالموبايل: ${viewOrder['رقم الهاتف']}\nالمحافظة: ${viewOrder['المحافظة']}\nالعنوان: ${viewOrder['العنوان التفصيلي']}\nالشحن: ${viewOrder['مصاريف الشحن']}\nملاحظات: ${viewOrder['ملاحظات'] || ''}\nالمنتجات:\n${viewOrder['المنتجات']}\n===`}
+              {`الاسم: ${viewOrder['اسم العميل']}\nالموبايل: ${viewOrder['رقم الهاتف']}\nالمحافظة: ${viewOrder['المحافظة']}\nالعنوان: ${viewOrder['العنوان التفصيلي']}\nالشحن: ${viewOrder['مصاريف الشحن']}\nالإجمالي: ${viewOrder['الإجمالي الكلي']}\nملاحظات: ${viewOrder['ملاحظات'] || ''}\nالمنتجات:\n${viewOrder['المنتجات']}\n===`}
             </div>
 
             <div className={styles.modalActions}>
               <button 
                 className={`${styles.copyBtn} ${copied ? styles.copiedBtn : ''}`} 
                 onClick={() => {
-                  const text = `الاسم: ${viewOrder['اسم العميل']}\nالموبايل: ${viewOrder['رقم الهاتف']}\nالمحافظة: ${viewOrder['المحافظة']}\nالعنوان: ${viewOrder['العنوان التفصيلي']}\nالشحن: ${viewOrder['مصاريف الشحن']}\nملاحظات: ${viewOrder['ملاحظات'] || ''}\nالمنتجات:\n${viewOrder['المنتجات']}\n===`;
+                  const text = `الاسم: ${viewOrder['اسم العميل']}\nالموبايل: ${viewOrder['رقم الهاتف']}\nالمحافظة: ${viewOrder['المحافظة']}\nالعنوان: ${viewOrder['العنوان التفصيلي']}\nالشحن: ${viewOrder['مصاريف الشحن']}\nالإجمالي: ${viewOrder['الإجمالي الكلي']}\nملاحظات: ${viewOrder['ملاحظات'] || ''}\nالمنتجات:\n${viewOrder['المنتجات']}\n===`;
                   navigator.clipboard.writeText(text);
                   setCopied(true);
                   setTimeout(() => {
