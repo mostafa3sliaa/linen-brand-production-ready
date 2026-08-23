@@ -177,10 +177,10 @@ export default function AdminDashboard() {
                         {order['المنتجات']}
                       </td>
                       <td style={{ whiteSpace: 'nowrap', fontSize: '0.9em', lineHeight: 1.6 }}>
-                        <div>منتجات: <strong>{order['إجمالي المنتجات']}</strong></div>
-                        <div>شحن: <strong>{order['مصاريف الشحن']}</strong></div>
+                        <div>منتجات: <strong>{order['إجمالي المنتجات'] ? `${order['إجمالي المنتجات']} ج.م` : '-'}</strong></div>
+                        <div>شحن: <strong>{order['مصاريف الشحن'] ? `${order['مصاريف الشحن']} ج.م` : '-'}</strong></div>
                         <div style={{ color: '#115e34', marginTop: '4px', borderTop: '1px solid #ddd', paddingTop: '2px' }}>
-                          إجمالي: <strong>{order['الإجمالي الكلي']}</strong>
+                          إجمالي: <strong>{order['الإجمالي الكلي'] ? `${order['الإجمالي الكلي']} ج.م` : '-'}</strong>
                         </div>
                       </td>
                       <td>{order['ملاحظات']}</td>
