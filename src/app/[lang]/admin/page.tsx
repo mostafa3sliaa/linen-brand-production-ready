@@ -152,17 +152,13 @@ export default function AdminDashboard() {
               <table className={styles.table}>
                 <thead>
                   <tr>
-                    <th>التاريخ والوقت</th>
-                    <th>اسم العميل</th>
-                    <th>رقم الموبايل</th>
-                    <th>العنوان التفصيلي</th>
-                    <th>المنتجات المطلوبة</th>
-                    <th>سعر المنتجات</th>
-                    <th>الشحن</th>
-                    <th>الإجمالي الكلي</th>
+                    <th>التاريخ</th>
+                    <th>العميل</th>
+                    <th>العنوان</th>
+                    <th>الطلبات</th>
+                    <th>الحساب</th>
                     <th>ملاحظات</th>
-                    <th>الحالة</th>
-                    <th>إجراء</th>
+                    <th>الحالة والإجراء</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -172,34 +168,40 @@ export default function AdminDashboard() {
                         <div style={{ fontSize: '0.85em', whiteSpace: 'nowrap' }}>{order['التاريخ والوقت']?.split(' ')[0]}</div>
                         <div style={{ fontSize: '0.85em', color: '#666', whiteSpace: 'nowrap' }}>{order['التاريخ والوقت']?.split(' ')[1]}</div>
                       </td>
-                      <td style={{ whiteSpace: 'nowrap' }}>{order['اسم العميل']}</td>
-                      <td dir="ltr" style={{textAlign: 'right', whiteSpace: 'nowrap'}}>{order['رقم الهاتف']}</td>
+                      <td style={{ whiteSpace: 'nowrap' }}>
+                        <div style={{ fontWeight: 600 }}>{order['اسم العميل']}</div>
+                        <div style={{ fontSize: '0.9em', color: '#555' }} dir="ltr">{order['رقم الهاتف']}</div>
+                      </td>
                       <td style={{ minWidth: '150px' }}>{order['العنوان التفصيلي']}</td>
                       <td className={styles.itemsCol} style={{ whiteSpace: 'pre-line' }}>
                         {order['المنتجات']}
                       </td>
-                      <td style={{ fontSize: '0.85em', whiteSpace: 'nowrap' }}>{order['إجمالي المنتجات']} ج.م</td>
-                      <td style={{ fontSize: '0.85em', whiteSpace: 'nowrap' }}>{order['مصاريف الشحن']} ج.م</td>
-                      <td className={styles.totalCol} style={{ fontSize: '0.9em', whiteSpace: 'nowrap' }}>{order['الإجمالي الكلي']} ج.م</td>
-                      <td>{order['ملاحظات']}</td>
-                      <td>
-                        <span className={`${styles.statusBadge} ${order['الحالة'] === 'Processed' ? styles.badgeProcessed : ''}`}>
-                          {order['الحالة'] === 'Processed' ? 'تم' : 'جديد'}
-                        </span>
+                      <td style={{ whiteSpace: 'nowrap', fontSize: '0.9em', lineHeight: 1.6 }}>
+                        <div>منتجات: <strong>{order['إجمالي المنتجات']}</strong></div>
+                        <div>شحن: <strong>{order['مصاريف الشحن']}</strong></div>
+                        <div style={{ color: '#115e34', marginTop: '4px', borderTop: '1px solid #ddd', paddingTop: '2px' }}>
+                          إجمالي: <strong>{order['الإجمالي الكلي']}</strong>
+                        </div>
                       </td>
-                      <td>
-                        <div className={styles.actionCell}>
-                          <label className={styles.switch}>
-                            <input 
-                              type="checkbox" 
-                              checked={order['الحالة'] === 'Processed'}
-                              onChange={(e) => updateStatus([order['رقم الطلب']], e.target.checked ? 'Processed' : 'New')}
-                            />
-                            <span className={styles.slider}></span>
-                          </label>
-                          <button onClick={() => setViewOrder(order)} className={styles.iconBtn} title="عرض ونسخ">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                          </button>
+                      <td>{order['ملاحظات']}</td>
+                      <td style={{ verticalAlign: 'middle' }}>
+                        <div className={styles.actionCell} style={{ flexDirection: 'column', gap: '8px', alignItems: 'center' }}>
+                          <span className={`${styles.statusBadge} ${order['الحالة'] === 'Processed' ? styles.badgeProcessed : ''}`}>
+                            {order['الحالة'] === 'Processed' ? 'تم' : 'جديد'}
+                          </span>
+                          <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                            <label className={styles.switch}>
+                              <input 
+                                type="checkbox" 
+                                checked={order['الحالة'] === 'Processed'}
+                                onChange={(e) => updateStatus([order['رقم الطلب']], e.target.checked ? 'Processed' : 'New')}
+                              />
+                              <span className={styles.slider}></span>
+                            </label>
+                            <button onClick={() => setViewOrder(order)} className={styles.iconBtn} title="عرض ونسخ">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                            </button>
+                          </div>
                         </div>
                       </td>
                     </tr>
