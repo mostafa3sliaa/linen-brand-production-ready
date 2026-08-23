@@ -12,10 +12,13 @@ export async function sendTelegramNotification(orderData: any) {
     return `${shortName} ${item.color} ${item.size} - الكمية ${item.quantity} - السعر ${item.price}`;
   }).join('\n');
 
+  const total = orderData.items.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0) + 50;
+
   const text = `الاسم: ${orderData.customerName}
 الموبايل: ${orderData.phone}
 العنوان: ${orderData.address}
 الشحن: 50
+الإجمالي: ${total}
 ملاحظات: ${orderData.notes || ""}
 المنتجات:
 ${itemsString}
