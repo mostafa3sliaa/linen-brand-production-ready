@@ -116,8 +116,8 @@ export default function AdminDashboard() {
           ) : orders.length === 0 ? (
             <div className={styles.emptyState}>لا توجد طلبات حتى الآن.</div>
           ) : (
-            <div className={styles.tableWrapper} style={{ overflowX: 'auto', width: '100%' }}>
-              <table className={styles.table} style={{ whiteSpace: 'nowrap' }}>
+            <div className={styles.tableWrapper}>
+              <table className={styles.table}>
                 <thead>
                   <tr>
                     <th>التاريخ والوقت</th>
@@ -139,14 +139,14 @@ export default function AdminDashboard() {
                       <td>{order['التاريخ والوقت']}</td>
                       <td>{order['اسم العميل']}</td>
                       <td dir="ltr" style={{textAlign: 'right'}}>{order['رقم الهاتف']}</td>
-                      <td style={{ whiteSpace: 'normal', minWidth: '150px' }}>{order['العنوان التفصيلي']}</td>
-                      <td className={styles.itemsCol} style={{ whiteSpace: 'pre-line', minWidth: '200px' }}>
+                      <td>{order['العنوان التفصيلي']}</td>
+                      <td className={styles.itemsCol}>
                         {order['المنتجات']}
                       </td>
                       <td>{order['إجمالي المنتجات']} ج.م</td>
                       <td>{order['مصاريف الشحن']} ج.م</td>
                       <td className={styles.totalCol}>{order['الإجمالي الكلي']} ج.م</td>
-                      <td style={{ whiteSpace: 'normal', minWidth: '100px' }}>{order['ملاحظات']}</td>
+                      <td>{order['ملاحظات']}</td>
                       <td>
                         <span className={`${styles.statusBadge} ${order['الحالة'] === 'Processed' ? styles.badgeProcessed : ''}`}>
                           {order['الحالة'] === 'Processed' ? 'تم' : 'جديد'}
@@ -162,8 +162,8 @@ export default function AdminDashboard() {
                             />
                             <span className={styles.slider}></span>
                           </label>
-                          <button onClick={() => setViewOrder(order)} className={styles.viewBtn}>
-                            عرض ونسخ
+                          <button onClick={() => setViewOrder(order)} className={styles.iconBtn} title="عرض ونسخ">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                           </button>
                         </div>
                       </td>
