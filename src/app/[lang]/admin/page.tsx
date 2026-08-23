@@ -116,8 +116,8 @@ export default function AdminDashboard() {
           ) : orders.length === 0 ? (
             <div className={styles.emptyState}>لا توجد طلبات حتى الآن.</div>
           ) : (
-            <div className={styles.tableWrapper}>
-              <table className={styles.table}>
+            <div className={styles.tableWrapper} style={{ overflowX: 'auto', width: '100%' }}>
+              <table className={styles.table} style={{ minWidth: '1500px' }}>
                 <thead>
                   <tr>
                     <th>رقم الطلب</th>
