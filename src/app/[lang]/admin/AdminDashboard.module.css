@@ -69,6 +69,21 @@
   margin: 0;
 }
 
+.filterGroup {
+  margin: 0 var(--space-4);
+}
+
+.dateFilter {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #ced4da;
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+  cursor: pointer;
+  background-color: white;
+}
+
 .secondaryBtn {
   background: var(--color-white);
   border: 1px solid var(--color-light-grey);

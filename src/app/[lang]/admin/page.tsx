@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import styles from './AdminDashboard.module.css';
 
 export default function AdminDashboard() {
@@ -9,6 +9,7 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [viewOrder, setViewOrder] = useState<any | null>(null);
   const [copied, setCopied] = useState(false);
+  const [filterDate, setFilterDate] = useState<string>('All');
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,7 +43,6 @@ export default function AdminDashboard() {
         body: JSON.stringify({ orderIds, status })
       });
       if (res.ok) {
-        // Update local state
         setOrders(orders.map(o => 
           orderIds.includes(o['رقم الطلب']) ? { ...o, 'الحالة': status } : o
         ));
@@ -58,6 +58,24 @@ export default function AdminDashboard() {
       updateStatus(newOrderIds, 'Processed');
     }
   };
+
+  // Get unique dates for filter
+  const uniqueDates = useMemo(() => {
+    const dates = orders.map(o => {
+      const dateTime = o['التاريخ والوقت'] || '';
+      return dateTime.split(' ')[0]; // Extract just the DD/MM/YYYY part
+    }).filter(d => d);
+    return Array.from(new Set(dates));
+  }, [orders]);
+
+  // Filter orders by selected date
+  const filteredOrders = useMemo(() => {
+    if (filterDate === 'All') return orders;
+    return orders.filter(o => {
+      const dateTime = o['التاريخ والوقت'] || '';
+      return dateTime.startsWith(filterDate);
+    });
+  }, [orders, filterDate]);
 
   if (!isAuthenticated) {
     return (
@@ -86,6 +104,20 @@ export default function AdminDashboard() {
         <div className={styles.header}>
           <div className={styles.headerLeft}>
             <h1 className={styles.title}>الطلبات الواردة</h1>
+            
+            <div className={styles.filterGroup}>
+              <select 
+                value={filterDate} 
+                onChange={(e) => setFilterDate(e.target.value)}
+                className={styles.dateFilter}
+              >
+                <option value="All">كل التواريخ</option>
+                {uniqueDates.map(date => (
+                  <option key={date} value={date}>{date}</option>
+                ))}
+              </select>
+            </div>
+
             <button onClick={markAllProcessed} className={styles.secondaryBtn}>
               تحديد الكل كـ مقروء ✓
             </button>
@@ -98,23 +130,23 @@ export default function AdminDashboard() {
         <div className={styles.statsContainer}>
           <div className={styles.statCard}>
             <span className={styles.statLabel}>إجمالي الطلبات</span>
-            <span className={styles.statValue}>{orders.length}</span>
+            <span className={styles.statValue}>{filteredOrders.length}</span>
           </div>
           <div className={`${styles.statCard} ${styles.new}`}>
             <span className={styles.statLabel}>الطلبات الجديدة</span>
-            <span className={styles.statValue}>{orders.filter(o => o['الحالة'] === 'New').length}</span>
+            <span className={styles.statValue}>{filteredOrders.filter(o => o['الحالة'] === 'New').length}</span>
           </div>
           <div className={`${styles.statCard} ${styles.processed}`}>
             <span className={styles.statLabel}>تم التسليم (مقروء)</span>
-            <span className={styles.statValue}>{orders.filter(o => o['الحالة'] === 'Processed').length}</span>
+            <span className={styles.statValue}>{filteredOrders.filter(o => o['الحالة'] === 'Processed').length}</span>
           </div>
         </div>
 
         <div className={styles.card}>
           {loading ? (
             <div className={styles.loading}>جاري تحميل الطلبات...</div>
-          ) : orders.length === 0 ? (
-            <div className={styles.emptyState}>لا توجد طلبات حتى الآن.</div>
+          ) : filteredOrders.length === 0 ? (
+            <div className={styles.emptyState}>لا توجد طلبات في هذا التاريخ.</div>
           ) : (
             <div className={styles.tableWrapper}>
               <table className={styles.table}>
@@ -134,7 +166,7 @@ export default function AdminDashboard() {
                   </tr>
                 </thead>
                 <tbody>
-                  {orders.map((order, idx) => (
+                  {filteredOrders.map((order, idx) => (
                     <tr key={idx} className={order['الحالة'] === 'Processed' ? styles.processedRow : ''}>
                       <td>{order['التاريخ والوقت']}</td>
                       <td>{order['اسم العميل']}</td>
