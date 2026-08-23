@@ -8,26 +8,18 @@ export async function sendTelegramNotification(orderData: any) {
   }
 
   const itemsString = orderData.items.map((item: any) => 
-    `- ${item.productName} (${item.color}, Size: ${item.size}) x${item.quantity} [${item.price * item.quantity} EGP]`
+    `${item.productName} (${item.color}, Size: ${item.size}) - الكمية ${item.quantity} - السعر ${item.price}`
   ).join('\n');
 
-  const total = orderData.items.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0) + 50;
-
-  const text = `
-🛒 *طلب جديد (New Order!)* 🛒
-
-👤 *الاسم:* ${orderData.customerName}
-📱 *الموبايل:* ${orderData.phone}
-📍 *العنوان:* ${orderData.address}
-
-📦 *المنتجات:*
+  const text = `الاسم: ${orderData.customerName}
+الموبايل: ${orderData.phone}
+المحافظة: 
+العنوان: ${orderData.address}
+الشحن: 50
+ملاحظات: ${orderData.notes || ""}
+المنتجات:
 ${itemsString}
-
-🚚 *الشحن:* 50 EGP
-💰 *الإجمالي:* ${total} EGP
-
-📝 *ملاحظات:* ${orderData.notes || 'لا يوجد'}
-  `;
+===`;
 
   try {
     await Promise.all(chatIds.map(chatId =>
