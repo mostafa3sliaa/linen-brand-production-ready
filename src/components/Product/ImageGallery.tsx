@@ -127,6 +127,7 @@ export default function ImageGallery({ colors, activeColorId, onColorChange, isA
                 src={imageSrc} 
                 alt={isAr ? color.label.ar : color.label.en}
                 fill
+                sizes="(max-width: 768px) 100vw, 50vw"
                 className={`${styles.mainImage} ${isZooming && safeActiveIndex === idx ? styles.zoomed : ''}`}
                 style={{ objectFit: 'cover', ...(isZooming && safeActiveIndex === idx ? zoomStyle : {}) }}
                 priority={idx === 0}
@@ -159,7 +160,7 @@ export default function ImageGallery({ colors, activeColorId, onColorChange, isA
               className={`${styles.thumbnailBtn} ${safeActiveIndex === idx ? styles.activeThumb : ''}`}
               aria-label={isAr ? color.label.ar : color.label.en}
             >
-              <Image src={imageSrc} alt="" fill style={{ objectFit: 'cover' }} />
+              <Image src={imageSrc} alt="" fill sizes="80px" style={{ objectFit: 'cover' }} />
             </button>
             );
           })}
