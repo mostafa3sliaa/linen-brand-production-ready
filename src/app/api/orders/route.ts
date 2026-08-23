@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs/promises';
-import path from 'path';
 import { appendOrderToSheet, getOrdersFromSheet } from '@/lib/googleSheets';
-import { sendWhatsAppNotification } from '@/lib/whatsapp';
 import { sendTelegramNotification } from '@/lib/telegram';
+import { sendWhatsAppNotification } from '@/lib/whatsapp';
 import { saveToQueue } from '@/lib/queue';
 import { orderSchema } from '@/lib/validations';
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 // Simple in-memory rate limiting (IP-based)
 const rateLimitMap = new Map<string, { count: number, timestamp: number }>();
