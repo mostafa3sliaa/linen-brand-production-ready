@@ -178,9 +178,9 @@ export default function AdminDashboard() {
                       <td className={styles.itemsCol} style={{ whiteSpace: 'pre-line' }}>
                         {order['المنتجات']}
                       </td>
-                      <td>{order['إجمالي المنتجات']} ج.م</td>
-                      <td>{order['مصاريف الشحن']} ج.م</td>
-                      <td className={styles.totalCol}>{order['الإجمالي الكلي']} ج.م</td>
+                      <td style={{ fontSize: '0.85em', whiteSpace: 'nowrap' }}>{order['إجمالي المنتجات']} ج.م</td>
+                      <td style={{ fontSize: '0.85em', whiteSpace: 'nowrap' }}>{order['مصاريف الشحن']} ج.م</td>
+                      <td className={styles.totalCol} style={{ fontSize: '0.9em', whiteSpace: 'nowrap' }}>{order['الإجمالي الكلي']} ج.م</td>
                       <td>{order['ملاحظات']}</td>
                       <td>
                         <span className={`${styles.statusBadge} ${order['الحالة'] === 'Processed' ? styles.badgeProcessed : ''}`}>
