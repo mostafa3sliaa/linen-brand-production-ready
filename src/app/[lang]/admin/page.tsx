@@ -117,14 +117,12 @@ export default function AdminDashboard() {
             <div className={styles.emptyState}>لا توجد طلبات حتى الآن.</div>
           ) : (
             <div className={styles.tableWrapper} style={{ overflowX: 'auto', width: '100%' }}>
-              <table className={styles.table} style={{ minWidth: '1500px' }}>
+              <table className={styles.table} style={{ whiteSpace: 'nowrap' }}>
                 <thead>
                   <tr>
-                    <th>رقم الطلب</th>
                     <th>التاريخ والوقت</th>
                     <th>اسم العميل</th>
                     <th>رقم الموبايل</th>
-                    <th>المحافظة</th>
                     <th>العنوان التفصيلي</th>
                     <th>المنتجات المطلوبة</th>
                     <th>سعر المنتجات</th>
@@ -138,19 +136,17 @@ export default function AdminDashboard() {
                 <tbody>
                   {orders.map((order, idx) => (
                     <tr key={idx} className={order['الحالة'] === 'Processed' ? styles.processedRow : ''}>
-                      <td className={styles.orderId}>{order['رقم الطلب'] || '-'}</td>
                       <td>{order['التاريخ والوقت']}</td>
                       <td>{order['اسم العميل']}</td>
                       <td dir="ltr" style={{textAlign: 'right'}}>{order['رقم الهاتف']}</td>
-                      <td>{order['المحافظة']}</td>
-                      <td>{order['العنوان التفصيلي']}</td>
-                      <td className={styles.itemsCol} style={{ whiteSpace: 'pre-line' }}>
+                      <td style={{ whiteSpace: 'normal', minWidth: '150px' }}>{order['العنوان التفصيلي']}</td>
+                      <td className={styles.itemsCol} style={{ whiteSpace: 'pre-line', minWidth: '200px' }}>
                         {order['المنتجات']}
                       </td>
                       <td>{order['إجمالي المنتجات']} ج.م</td>
                       <td>{order['مصاريف الشحن']} ج.م</td>
                       <td className={styles.totalCol}>{order['الإجمالي الكلي']} ج.م</td>
-                      <td>{order['ملاحظات']}</td>
+                      <td style={{ whiteSpace: 'normal', minWidth: '100px' }}>{order['ملاحظات']}</td>
                       <td>
                         <span className={`${styles.statusBadge} ${order['الحالة'] === 'Processed' ? styles.badgeProcessed : ''}`}>
                           {order['الحالة'] === 'Processed' ? 'تم' : 'جديد'}
