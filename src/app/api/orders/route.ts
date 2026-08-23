@@ -58,7 +58,7 @@ export async function POST(req: Request) {
     
     // Format items as a single string for the Excel sheet
     const itemsString = data.items.map((item: any) => 
-      `الطلب: ${item.productName.replace('طقم كتان صيفي بريميوم', 'كتان')} ${item.color} مقاس ${item.size} الكمية ${item.quantity} السعر ${item.price}`
+      `${item.productName.replace('طقم كتان صيفي بريميوم', 'كتان')} ${item.color} مقاس ${item.size} الكمية ${item.quantity} السعر ${item.price}`
     ).join('\n');
 
     const rowData = [
