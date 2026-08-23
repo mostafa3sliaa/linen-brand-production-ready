@@ -7,9 +7,10 @@ export async function sendTelegramNotification(orderData: any) {
     return false;
   }
 
-  const itemsString = orderData.items.map((item: any) => 
-    `${item.productName} ${item.color} ${item.size} - الكمية ${item.quantity} - السعر ${item.price}`
-  ).join('\n');
+  const itemsString = orderData.items.map((item: any) => {
+    const shortName = item.productName.replace('طقم كتان صيفي بريميوم', 'كتان');
+    return `${shortName} ${item.color} ${item.size} - الكمية ${item.quantity} - السعر ${item.price}`;
+  }).join('\n');
 
   const text = `الاسم: ${orderData.customerName}
 الموبايل: ${orderData.phone}
