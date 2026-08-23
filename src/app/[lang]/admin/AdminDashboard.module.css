@@ -71,6 +71,23 @@
 
 .filterGroup {
   margin: 0 var(--space-4);
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.searchInput {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #ced4da;
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+  width: 250px;
+}
+
+.searchInput:focus {
+  border-color: #115e34;
 }
 
 .dateFilter {

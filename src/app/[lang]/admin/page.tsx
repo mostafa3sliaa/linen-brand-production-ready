@@ -10,6 +10,7 @@ export default function AdminDashboard() {
   const [viewOrder, setViewOrder] = useState<any | null>(null);
   const [copied, setCopied] = useState(false);
   const [filterDate, setFilterDate] = useState<string>('All');
+  const [searchQuery, setSearchQuery] = useState<string>('');
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,14 +69,22 @@ export default function AdminDashboard() {
     return Array.from(new Set(dates));
   }, [orders]);
 
-  // Filter orders by selected date
+  // Filter orders by selected date and search query
   const filteredOrders = useMemo(() => {
-    if (filterDate === 'All') return orders;
     return orders.filter(o => {
+      // Date Match
       const dateTime = o['التاريخ والوقت'] || '';
-      return dateTime.startsWith(filterDate);
+      const dateMatch = filterDate === 'All' || dateTime.startsWith(filterDate);
+      
+      // Search Match
+      const searchLower = searchQuery.toLowerCase();
+      const nameMatch = (o['اسم العميل'] || '').toLowerCase().includes(searchLower);
+      const phoneMatch = (o['رقم الهاتف'] || '').includes(searchLower);
+      const searchMatch = !searchQuery || nameMatch || phoneMatch;
+
+      return dateMatch && searchMatch;
     });
-  }, [orders, filterDate]);
+  }, [orders, filterDate, searchQuery]);
 
   if (!isAuthenticated) {
     return (
@@ -106,6 +115,13 @@ export default function AdminDashboard() {
             <h1 className={styles.title}>الطلبات الواردة</h1>
             
             <div className={styles.filterGroup}>
+              <input
+                type="text"
+                placeholder="بحث بالاسم أو رقم الموبايل..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className={styles.searchInput}
+              />
               <select 
                 value={filterDate} 
                 onChange={(e) => setFilterDate(e.target.value)}
