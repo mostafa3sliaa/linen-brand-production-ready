@@ -168,11 +168,14 @@ export default function AdminDashboard() {
                 <tbody>
                   {filteredOrders.map((order, idx) => (
                     <tr key={idx} className={order['الحالة'] === 'Processed' ? styles.processedRow : ''}>
-                      <td>{order['التاريخ والوقت']}</td>
-                      <td>{order['اسم العميل']}</td>
-                      <td dir="ltr" style={{textAlign: 'right'}}>{order['رقم الهاتف']}</td>
-                      <td>{order['العنوان التفصيلي']}</td>
-                      <td className={styles.itemsCol}>
+                      <td>
+                        <div style={{ fontSize: '0.85em', whiteSpace: 'nowrap' }}>{order['التاريخ والوقت']?.split(' ')[0]}</div>
+                        <div style={{ fontSize: '0.85em', color: '#666', whiteSpace: 'nowrap' }}>{order['التاريخ والوقت']?.split(' ')[1]}</div>
+                      </td>
+                      <td style={{ whiteSpace: 'nowrap' }}>{order['اسم العميل']}</td>
+                      <td dir="ltr" style={{textAlign: 'right', whiteSpace: 'nowrap'}}>{order['رقم الهاتف']}</td>
+                      <td style={{ minWidth: '150px' }}>{order['العنوان التفصيلي']}</td>
+                      <td className={styles.itemsCol} style={{ whiteSpace: 'pre-line' }}>
                         {order['المنتجات']}
                       </td>
                       <td>{order['إجمالي المنتجات']} ج.م</td>
