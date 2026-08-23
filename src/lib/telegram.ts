@@ -8,7 +8,7 @@ export async function sendTelegramNotification(orderData: any) {
   }
 
   const itemsString = orderData.items.map((item: any) => 
-    `${item.productName} (${item.color}, Size: ${item.size}) - الكمية ${item.quantity} - السعر ${item.price}`
+    `${item.productName} ${item.color} ${item.size} - الكمية ${item.quantity} - السعر ${item.price}`
   ).join('\n');
 
   const text = `الاسم: ${orderData.customerName}
