@@ -92,31 +92,31 @@
 
 .sizeGuideBtn {
   font-size: var(--text-sm);
-  color: #fff;
+  color: #000;
   text-decoration: none;
   cursor: pointer;
   padding: 8px 16px;
-  background: linear-gradient(135deg, #111, #333);
-  border: 1px solid #000;
+  background: linear-gradient(135deg, #e5d3b3, #cda770);
+  border: 1px solid #cda770;
   border-radius: 20px;
   transition: all 0.3s ease;
-  font-weight: 600;
+  font-weight: 700;
   display: flex;
   gap: 6px;
   align-items: center;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 10px rgba(205, 167, 112, 0.3);
   animation: pulse-btn 2s infinite;
 }
 
 @keyframes pulse-btn {
-  0% { box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.4); transform: scale(1); }
+  0% { box-shadow: 0 0 0 0 rgba(205, 167, 112, 0.6); transform: scale(1); }
   50% { transform: scale(1.02); }
-  70% { box-shadow: 0 0 0 10px rgba(0, 0, 0, 0); transform: scale(1); }
-  100% { box-shadow: 0 0 0 0 rgba(0, 0, 0, 0); transform: scale(1); }
+  70% { box-shadow: 0 0 0 10px rgba(205, 167, 112, 0); transform: scale(1); }
+  100% { box-shadow: 0 0 0 0 rgba(205, 167, 112, 0); transform: scale(1); }
 }
 
 .sizeGuideBtn:hover {
-  background: linear-gradient(135deg, #000, #111);
+  background: linear-gradient(135deg, #cda770, #b58d51);
   transform: translateY(-2px) scale(1.02);
 }
 
