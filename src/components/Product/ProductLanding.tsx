@@ -280,6 +280,19 @@ export default function ProductLanding({ lang }: { lang: string }) {
                 </button>
               ))}
             </div>
+
+            {/* Dynamic Size Info */}
+            <div className={styles.dynamicSizeInfo}>
+              <div className={styles.sizeInfoWeight}>
+                <span>{isAr ? 'الوزن المناسب:' : 'Ideal Weight:'}</span>
+                <strong>{PRODUCT.sizeChart[activeSize as keyof typeof PRODUCT.sizeChart].weight}</strong>
+              </div>
+              <div className={styles.sizeMeasurements}>
+                <span>{isAr ? 'عرض القميص' : 'Shirt Width'}: {PRODUCT.sizeChart[activeSize as keyof typeof PRODUCT.sizeChart].shirtWidth} {isAr ? 'سم' : 'cm'}</span>
+                <span>{isAr ? 'طول القميص' : 'Shirt Length'}: {PRODUCT.sizeChart[activeSize as keyof typeof PRODUCT.sizeChart].shirtLength} {isAr ? 'سم' : 'cm'}</span>
+                <span>{isAr ? 'طول البنطلون' : 'Pants Length'}: {PRODUCT.sizeChart[activeSize as keyof typeof PRODUCT.sizeChart].pantsLength} {isAr ? 'سم' : 'cm'}</span>
+              </div>
+            </div>
           </div>
 
           <button className={styles.ctaBtn} onClick={() => addToCart()}>

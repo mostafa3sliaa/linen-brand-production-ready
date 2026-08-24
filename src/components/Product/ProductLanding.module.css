@@ -142,6 +142,38 @@
   gap: var(--space-2);
 }
 
+.dynamicSizeInfo {
+  margin-top: 15px;
+  padding: 10px 15px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.sizeInfoWeight {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 15px;
+  color: #333;
+}
+
+.sizeInfoWeight strong {
+  color: #115e34;
+  font-size: 16px;
+}
+
+.sizeMeasurements {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  font-size: 13px;
+  color: #6c757d;
+  border-top: 1px solid #e9ecef;
+  padding-top: 8px;
+}
+
 .sizeBtn {
   min-width: 60px;
   height: 45px;
