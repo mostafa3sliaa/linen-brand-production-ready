@@ -91,25 +91,33 @@
 }
 
 .sizeGuideBtn {
-  font-size: var(--text-xs);
-  color: var(--color-black);
+  font-size: var(--text-sm);
+  color: #fff;
   text-decoration: none;
   cursor: pointer;
-  padding: var(--space-2) var(--space-3);
-  background: var(--color-white);
-  border: 1px solid var(--color-light-grey);
-  border-radius: var(--radius-sm);
-  transition: all 0.2s ease;
-  font-weight: 500;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #111, #333);
+  border: 1px solid #000;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+  font-weight: 600;
   display: flex;
+  gap: 6px;
   align-items: center;
-  gap: 4px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  animation: pulse-btn 2s infinite;
+}
+
+@keyframes pulse-btn {
+  0% { box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.4); transform: scale(1); }
+  50% { transform: scale(1.02); }
+  70% { box-shadow: 0 0 0 10px rgba(0, 0, 0, 0); transform: scale(1); }
+  100% { box-shadow: 0 0 0 0 rgba(0, 0, 0, 0); transform: scale(1); }
 }
 
 .sizeGuideBtn:hover {
-  background: var(--color-black);
-  color: var(--color-white);
-  border-color: var(--color-black);
+  background: linear-gradient(135deg, #000, #111);
+  transform: translateY(-2px) scale(1.02);
 }
 
 /* Color Picker */
@@ -147,11 +155,8 @@
   padding: 15px 20px;
   background: linear-gradient(145deg, #ffffff, #fafafa);
   border-radius: 12px;
-  border: 2px solid #111;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-  animation: pulse-attention 2s infinite;
-  position: relative;
-  overflow: hidden;
+  border: 1px solid #ddd;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
 }
 
 @keyframes pulse-attention {
