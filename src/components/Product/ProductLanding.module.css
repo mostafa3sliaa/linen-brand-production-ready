@@ -144,34 +144,56 @@
 
 .dynamicSizeInfo {
   margin-top: 15px;
-  padding: 10px 15px;
-  background-color: #f8f9fa;
-  border-radius: 8px;
-  border: 1px solid #e9ecef;
+  padding: 15px 20px;
+  background: linear-gradient(145deg, #ffffff, #fafafa);
+  border-radius: 12px;
+  border: 2px solid #111;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  animation: pulse-attention 2s infinite;
+  position: relative;
+  overflow: hidden;
+}
+
+@keyframes pulse-attention {
+  0% { box-shadow: 0 0 0 0 rgba(17, 17, 17, 0.3); }
+  70% { box-shadow: 0 0 0 8px rgba(17, 17, 17, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(17, 17, 17, 0); }
 }
 
 .sizeInfoWeight {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
   font-size: 15px;
   color: #333;
+  font-weight: 700;
 }
 
 .sizeInfoWeight strong {
-  color: #115e34;
+  color: #fff;
+  background: #111;
   font-size: 16px;
+  padding: 4px 14px;
+  border-radius: 20px;
+  letter-spacing: 0.5px;
 }
 
 .sizeMeasurements {
   display: flex;
   flex-wrap: wrap;
-  gap: 15px;
+  gap: 10px;
   font-size: 13px;
-  color: #6c757d;
-  border-top: 1px solid #e9ecef;
-  padding-top: 8px;
+  color: #444;
+  border-top: 1px dashed #ccc;
+  padding-top: 12px;
+}
+
+.sizeMeasurements span {
+  background: #f1f1f1;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-weight: 600;
 }
 
 .sizeBtn {
