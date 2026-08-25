@@ -60,7 +60,7 @@ export async function POST(req: Request) {
     const time = new Date().toLocaleTimeString('en-GB');
     
     const itemsString = data.items.map((item: any) => 
-      `${item.productName.replace('طقم كتان صيفي بريميوم', 'كتان')} ${item.color} ${item.size} - الكمية ${item.quantity} - السعر ${item.price}`
+      `${item.productName.replace('طقم كتان بريميوم', 'كتان')} ${item.color} ${item.size} - الكمية ${item.quantity} - السعر ${item.price}`
     ).join('\n');
 
     const productsTotal = data.items.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0);

@@ -8,12 +8,12 @@ const cairo = Cairo({ subsets: ['arabic', 'latin'], weight: ['300', '400', '500'
 const outfit = Outfit({ subsets: ['latin'], weight: ['300', '400', '500', '700'], variable: '--font-outfit' })
 
 export const metadata: Metadata = {
-  title: 'Mitsh | طقم كتان صيفي بريميوم',
-  description: 'اكتشف مجموعتنا الحصرية من ميتش. طقم كتان صيفي بريميوم بأفضل خامة وألوان جذابة.',
+  title: 'Mitsh | طقم كتان بريميوم',
+  description: 'اكتشف مجموعتنا الحصرية من ميتش. طقم كتان بريميوم بأفضل خامة وألوان جذابة.',
   keywords: 'طقم كتان, ملابس صيفية, ميتش, Mitsh, ملابس رجالي, ملابس حريمي, أطقم كاجوال',
   openGraph: {
-    title: 'Mitsh | طقم كتان صيفي بريميوم',
-    description: 'طقم كتان صيفي بريميوم بخامة ممتازة وألوان جذابة. اطلب الآن من ميتش!',
+    title: 'Mitsh | طقم كتان بريميوم',
+    description: 'طقم كتان بريميوم بخامة ممتازة وألوان جذابة. اطلب الآن من ميتش!',
     url: 'https://mitsh.vercel.app',
     siteName: 'Mitsh',
     images: [
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Mitsh | ميتش',
-    description: 'طقم كتان صيفي بريميوم بخامة ممتازة وألوان جذابة.',
+    description: 'طقم كتان بريميوم بخامة ممتازة وألوان جذابة.',
     images: ['https://mitsh.vercel.app/images/hero-main.jpg'],
   },
   icons: {
