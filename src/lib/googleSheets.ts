@@ -89,14 +89,33 @@ export async function updateOrderStatus(orderId: string, status: string) {
   }
 }
 
-// In-memory cache for fast response
-let cachedConfig: { settings: any; products: any[] } | null = null;
+// Helper to check or create sheet tabs
+async function ensureSheetExists(sheets: any, spreadsheetId: string, sheetTitle: string) {
+  try {
+    const meta = await sheets.spreadsheets.get({ spreadsheetId });
+    const exists = meta.data.sheets?.some((s: any) => s.properties?.title === sheetTitle);
+    if (!exists) {
+      await sheets.spreadsheets.batchUpdate({
+        spreadsheetId,
+        requestBody: {
+          requests: [
+            {
+              addSheet: {
+                properties: { title: sheetTitle },
+              },
+            },
+          ],
+        },
+      });
+    }
+    return true;
+  } catch (e: any) {
+    console.error(`Error ensuring sheet ${sheetTitle}:`, e.message || e);
+    return false;
+  }
+}
 
 export async function getStoreConfig() {
-  if (cachedConfig) {
-    return cachedConfig;
-  }
-
   const defaultSettings = {
     fbPixelId: process.env.NEXT_PUBLIC_FB_PIXEL_ID || '1726555298615011',
     tiktokPixelId: process.env.NEXT_PUBLIC_TIKTOK_PIXEL_ID || 'D9INTRJC77U820ARL2J0',
@@ -119,98 +138,116 @@ export async function getStoreConfig() {
   const sheets = google.sheets({ version: 'v4', auth });
   const spreadsheetId = '1KWTEpGeVqQgSLVhV606uKJ3MC_cOlP7iOFBzmShqDk0';
 
+  let settings = defaultSettings;
+  let products = defaultProducts;
+
+  // 1. Fetch settings from Config!A1
   try {
-    const res = await sheets.spreadsheets.values.get({
+    const resSettings = await sheets.spreadsheets.values.get({
       spreadsheetId,
-      range: 'Config!A1:B1',
+      range: 'Config!A1',
     });
-
-    const row = res.data.values?.[0];
-    let settings = defaultSettings;
-    let products = defaultProducts;
-
-    if (row && row[0]) {
-      try {
-        const parsed = JSON.parse(row[0]);
-        if (parsed && typeof parsed === 'object') {
-          settings = { ...defaultSettings, ...parsed };
-        }
-      } catch (err) {
-        console.warn("Could not parse settings from Google Sheets:", err);
+    const val = resSettings.data.values?.[0]?.[0];
+    if (val) {
+      const parsed = JSON.parse(val);
+      if (parsed && typeof parsed === 'object') {
+        settings = { ...defaultSettings, ...parsed };
       }
     }
-
-    if (row && row[1]) {
-      try {
-        const parsed = JSON.parse(row[1]);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          products = parsed;
-        }
-      } catch (err) {
-        console.warn("Could not parse products from Google Sheets:", err);
-      }
-    }
-
-    cachedConfig = { settings, products };
-    return cachedConfig;
-  } catch (error: any) {
-    // If Config sheet does not exist or network error, return defaults
-    console.warn("Could not fetch Config sheet from Google Sheets, using defaults:", error.message || error);
-    return { settings: defaultSettings, products: defaultProducts };
+  } catch (e) {
+    // Config sheet may not exist yet, fallback to defaults
   }
+
+  // 2. Fetch products from Products!A:A (each row contains 1 product JSON)
+  try {
+    const resProducts = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: 'Products!A:A',
+    });
+    const rows = resProducts.data.values;
+    if (rows && rows.length > 0) {
+      const loadedProducts: any[] = [];
+      for (const row of rows) {
+        if (row && row[0]) {
+          try {
+            const p = JSON.parse(row[0]);
+            if (p && p.id) {
+              loadedProducts.push(p);
+            }
+          } catch (pErr) {
+            console.warn("Error parsing product row JSON:", pErr);
+          }
+        }
+      }
+      if (loadedProducts.length > 0) {
+        products = loadedProducts;
+      }
+    }
+  } catch (e) {
+    // Products sheet may not exist yet, fallback to defaults
+  }
+
+  return { settings, products };
 }
 
 export async function saveStoreConfig(newConfig: { settings?: any; products?: any[] }) {
-  const current = await getStoreConfig();
-  const updatedSettings = newConfig.settings ? { ...current.settings, ...newConfig.settings } : current.settings;
-  const updatedProducts = newConfig.products ? newConfig.products : current.products;
-
-  cachedConfig = { settings: updatedSettings, products: updatedProducts };
-
   const auth = getAuthClient();
   if (!auth) return false;
 
   const sheets = google.sheets({ version: 'v4', auth });
   const spreadsheetId = '1KWTEpGeVqQgSLVhV606uKJ3MC_cOlP7iOFBzmShqDk0';
 
-  const values = [[JSON.stringify(updatedSettings), JSON.stringify(updatedProducts)]];
+  let success = true;
 
-  const updateRange = async () => {
-    return await sheets.spreadsheets.values.update({
-      spreadsheetId,
-      range: 'Config!A1:B1',
-      valueInputOption: 'USER_ENTERED',
-      requestBody: { values },
-    });
-  };
-
-  try {
-    await updateRange();
-    return true;
-  } catch (error: any) {
-    // If Config sheet doesn't exist, create it via batchUpdate
+  // Save Settings if provided
+  if (newConfig.settings) {
     try {
-      await sheets.spreadsheets.batchUpdate({
+      await ensureSheetExists(sheets, spreadsheetId, 'Config');
+      await sheets.spreadsheets.values.update({
         spreadsheetId,
+        range: 'Config!A1',
+        valueInputOption: 'USER_ENTERED',
         requestBody: {
-          requests: [
-            {
-              addSheet: {
-                properties: {
-                  title: 'Config',
-                },
-              },
-            },
-          ],
+          values: [[JSON.stringify(newConfig.settings)]],
         },
       });
-      // Retry update
-      await updateRange();
-      return true;
-    } catch (batchErr) {
-      console.error("Failed to create Config sheet or update:", batchErr);
-      return false;
+    } catch (e) {
+      console.error("Failed to save settings to Google Sheets:", e);
+      success = false;
     }
   }
+
+  // Save Products if provided
+  if (newConfig.products) {
+    try {
+      await ensureSheetExists(sheets, spreadsheetId, 'Products');
+
+      // Clear existing product rows
+      try {
+        await sheets.spreadsheets.values.clear({
+          spreadsheetId,
+          range: 'Products!A:A',
+        });
+      } catch (clearErr) {
+        // Ignored
+      }
+
+      // Write each product in its own row
+      const rows = newConfig.products.map(p => [JSON.stringify(p)]);
+      await sheets.spreadsheets.values.update({
+        spreadsheetId,
+        range: `Products!A1:A${rows.length}`,
+        valueInputOption: 'USER_ENTERED',
+        requestBody: {
+          values: rows,
+        },
+      });
+    } catch (e) {
+      console.error("Failed to save products to Google Sheets:", e);
+      success = false;
+    }
+  }
+
+  return success;
 }
 

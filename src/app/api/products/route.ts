@@ -37,7 +37,10 @@ export async function POST(req: Request) {
     }
 
     const success = await saveStoreConfig({ products: updatedProducts });
-    return NextResponse.json({ success, products: updatedProducts });
+    if (!success) {
+      return NextResponse.json({ error: "تعذر الحفظ في قاعدة البيانات، يرجى المحاولة مرة أخرى" }, { status: 500 });
+    }
+    return NextResponse.json({ success: true, products: updatedProducts });
   } catch (error) {
     console.error("Error saving product:", error);
     return NextResponse.json({ error: "Failed to save product" }, { status: 500 });
