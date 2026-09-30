@@ -621,6 +621,27 @@ input:checked + .slider:before {
   background: #ffe3e3;
 }
 
+.editProductBtn {
+  background: #f1f5f9;
+  color: #1e293b;
+  border: 1px solid #cbd5e1;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.editProductBtn:hover {
+  background: #e2e8f0;
+  border-color: #94a3b8;
+}
+
 /* Settings Card */
 .settingsCard {
   background: white;

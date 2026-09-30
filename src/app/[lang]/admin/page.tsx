@@ -20,6 +20,7 @@ export default function AdminDashboard() {
   const [products, setProducts] = useState<any[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(false);
   const [isAddProductOpen, setIsAddProductOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
   const [productSuccessMsg, setProductSuccessMsg] = useState('');
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -43,6 +44,7 @@ export default function AdminDashboard() {
     sizes: ['M', 'L', 'XL', '2XL', '3XL', '4XL'],
     hasSizeChart: true,
     videoUrl: '',
+    sizeChart: undefined as any,
   });
 
   // Available size presets
@@ -296,6 +298,73 @@ export default function AdminDashboard() {
     setCustomSizeInput('');
   };
 
+  const handleOpenAddProduct = () => {
+    setIsEditing(false);
+    setNewProduct({
+      id: '',
+      nameAr: '',
+      nameEn: '',
+      price: 650,
+      shipping: 50,
+      featuresAr: 'خامة كتان فاخرة\nمناسب لكل الأوقات\nألوان أنيقة وعصرية',
+      images: [],
+      colors: [
+        { id: 'c-black', labelAr: 'أسود', hex: '#000000' }
+      ],
+      sizes: ['M', 'L', 'XL', '2XL', '3XL', '4XL'],
+      hasSizeChart: true,
+      videoUrl: '',
+      sizeChart: undefined,
+    });
+    setIsAddProductOpen(true);
+  };
+
+  const handleOpenEditProduct = (p: any) => {
+    setIsEditing(true);
+    let allImgs: string[] = [];
+    if (p.colors && p.colors.length > 0) {
+      p.colors.forEach((c: any) => {
+        if (Array.isArray(c.images)) {
+          c.images.forEach((img: string) => {
+            if (img && !allImgs.includes(img)) allImgs.push(img);
+          });
+        }
+      });
+    }
+    if (allImgs.length === 0 && Array.isArray(p.images)) {
+      allImgs = p.images;
+    }
+    if (allImgs.length === 0 && p.image) {
+      allImgs = [p.image];
+    }
+
+    setNewProduct({
+      id: p.id || '',
+      nameAr: p.name?.ar || '',
+      nameEn: p.name?.en || '',
+      price: p.price ?? 650,
+      shipping: p.shipping ?? 50,
+      featuresAr: Array.isArray(p.features?.ar) 
+        ? p.features.ar.join('\n') 
+        : (typeof p.featuresAr === 'string' ? p.featuresAr : 'خامة كتان فاخرة\nمناسب لكل الأوقات'),
+      images: allImgs,
+      colors: p.colors && p.colors.length > 0 
+        ? p.colors.map((c: any, idx: number) => ({
+            id: c.id || `c-${idx}`,
+            labelAr: c.label?.ar || c.labelAr || 'لون',
+            hex: c.hex || '#000000'
+          })) 
+        : [{ id: 'c-black', labelAr: 'أسود', hex: '#000000' }],
+      sizes: Array.isArray(p.sizes) && p.sizes.length > 0 
+        ? p.sizes 
+        : ['M', 'L', 'XL', '2XL', '3XL', '4XL'],
+      hasSizeChart: p.hasSizeChart !== false,
+      videoUrl: p.videoUrl || '',
+      sizeChart: p.sizeChart,
+    });
+    setIsAddProductOpen(true);
+  };
+
   const handleCreateProduct = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newProduct.nameAr) {
@@ -337,14 +406,14 @@ export default function AdminDashboard() {
       },
       colors: finalColors,
       sizes: newProduct.sizes.length > 0 ? newProduct.sizes : ['M', 'L', 'XL', '2XL'],
-      sizeChart: newProduct.hasSizeChart ? {
+      sizeChart: newProduct.hasSizeChart ? (newProduct.sizeChart || {
         "M": { shirtWidth: 52, shirtLength: 68, pantsLength: 98, weight: "من 50 كيلو إلى 60 كيلو" },
         "L": { shirtWidth: 54, shirtLength: 70, pantsLength: 99, weight: "من 60 كيلو إلى 70 كيلو" },
         "XL": { shirtWidth: 56, shirtLength: 70, pantsLength: 100, weight: "من 70 كيلو إلى 80 كيلو" },
         "2XL": { shirtWidth: 58, shirtLength: 72, pantsLength: 100, weight: "من 80 كيلو إلى 90 كيلو" },
         "3XL": { shirtWidth: 60, shirtLength: 72, pantsLength: 102, weight: "من 90 كيلو إلى 100 كيلو" },
         "4XL": { shirtWidth: 62, shirtLength: 75, pantsLength: 102, weight: "من 100 كيلو إلى 110 كيلو" },
-      } : undefined
+      }) : undefined
     };
 
     try {
@@ -356,9 +425,14 @@ export default function AdminDashboard() {
       const data = await res.json();
       if (data.success || res.ok) {
         setIsAddProductOpen(false);
-        setProductSuccessMsg(`تمت إضافة ونشر المنتج "${newProduct.nameAr}" بنجاح!`);
+        setProductSuccessMsg(
+          isEditing 
+            ? `تم تعديل وتحديث المنتج "${newProduct.nameAr}" بنجاح!` 
+            : `تمت إضافة ونشر المنتج "${newProduct.nameAr}" بنجاح!`
+        );
         setTimeout(() => setProductSuccessMsg(''), 5000);
         fetchProducts();
+        setIsEditing(false);
         // Reset form
         setNewProduct({
           id: '',
@@ -374,13 +448,14 @@ export default function AdminDashboard() {
           sizes: ['M', 'L', 'XL', '2XL', '3XL', '4XL'],
           hasSizeChart: true,
           videoUrl: '',
+          sizeChart: undefined,
         });
       } else {
-        alert("فشل في إضافة المنتج: " + (data.error || "خطأ غير معروف"));
+        alert("فشل في حفظ المنتج: " + (data.error || "خطأ غير معروف"));
       }
     } catch (err) {
-      console.error("Error creating product:", err);
-      alert("حدث خطأ أثناء إضافة المنتج");
+      console.error("Error creating/editing product:", err);
+      alert(isEditing ? "حدث خطأ أثناء تعديل المنتج" : "حدث خطأ أثناء إضافة المنتج");
     }
   };
 
@@ -626,7 +701,7 @@ export default function AdminDashboard() {
                 </p>
               </div>
               <button 
-                onClick={() => setIsAddProductOpen(true)}
+                onClick={handleOpenAddProduct}
                 className={styles.addProductBtn}
               >
                 <span>+</span> إضافة منتج جديد
@@ -676,6 +751,14 @@ export default function AdminDashboard() {
                           >
                             👁️ فتح صفحة المنتج
                           </Link>
+                          <button 
+                            type="button"
+                            onClick={() => handleOpenEditProduct(p)}
+                            className={styles.editProductBtn}
+                            title="تعديل تفاصيل أو صور أو أسعار المنتج"
+                          >
+                            ✏️ تعديل
+                          </button>
                           {products.length > 1 && (
                             <button 
                               onClick={() => handleDeleteProduct(p.id, p.name?.ar)}
@@ -779,7 +862,9 @@ export default function AdminDashboard() {
         <div className={styles.formModalOverlay}>
           <div className={styles.formModalContent}>
             <div className={styles.formModalHeader}>
-              <h2 style={{ fontSize: '18px', fontWeight: 800 }}>إضافة منتج جديد للمتجر</h2>
+              <h2 style={{ fontSize: '18px', fontWeight: 800 }}>
+                {isEditing ? `✏️ تعديل المنتج: ${newProduct.nameAr || ''}` : 'إضافة منتج جديد للمتجر'}
+              </h2>
               <button 
                 className={styles.closeModalBtn}
                 onClick={() => setIsAddProductOpen(false)}
@@ -815,12 +900,16 @@ export default function AdminDashboard() {
                   <input 
                     type="text" 
                     required
+                    disabled={isEditing}
+                    style={isEditing ? { opacity: 0.7, cursor: 'not-allowed', background: '#f1f3f5' } : {}}
                     placeholder="مثال: classic-suit"
                     value={newProduct.id}
                     onChange={(e) => setNewProduct({ ...newProduct, id: e.target.value.toLowerCase().replace(/\s+/g, '-') })}
                   />
                   <p style={{ fontSize: '11px', color: '#6c757d', marginTop: '4px' }}>
-                    💡 هو الكلمة بالإنجليزية في رابط المنتج. يُكتب تلقائياً، ويمكنك تركه كما هو!
+                    {isEditing 
+                      ? '🔒 معرف الرابط ثابت أثناء التعديل لضمان عدم توقف روابط الإعلانات المنشورة.' 
+                      : '💡 هو الكلمة بالإنجليزية في رابط المنتج. يُكتب تلقائياً، ويمكنك تركه كما هو!'}
                   </p>
                 </div>
 
@@ -1046,7 +1135,7 @@ export default function AdminDashboard() {
                   className={styles.saveSettingsBtn}
                   style={{ background: '#115e34' }}
                 >
-                  حفظ ونشر صفحة المنتج الآن ✓
+                  {isEditing ? 'حفظ وتحديث بيانات المنتج ✓' : 'حفظ ونشر صفحة المنتج الآن ✓'}
                 </button>
                 <button 
                   type="button" 
