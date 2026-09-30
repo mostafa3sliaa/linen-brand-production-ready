@@ -19,9 +19,13 @@
 
 @media (min-width: 768px) {
   .grid {
-    grid-template-columns: 1.2fr 1fr; /* Image slightly larger */
-    gap: var(--space-12);
+    grid-template-columns: 1.1fr 1fr;
+    gap: var(--space-10);
     align-items: start;
+  }
+  .productDetails {
+    position: sticky;
+    top: 90px;
   }
 }
 

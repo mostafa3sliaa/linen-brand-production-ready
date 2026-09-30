@@ -232,20 +232,22 @@ export default function ProductLanding({ lang, initialProduct }: { lang: string;
         <div className={styles.productDetails}>
           <h1 className={styles.title}>{isAr ? PRODUCT.name.ar : PRODUCT.name.en}</h1>
           
-          <div className={styles.genderToggleContainer}>
-            <button 
-              className={`${styles.genderBtn} ${gender === 'men' ? styles.genderBtnActiveMen : ''}`}
-              onClick={() => setGender('men')}
-            >
-              {isAr ? 'رجالي' : "Men's"}
-            </button>
-            <button 
-              className={`${styles.genderBtn} ${gender === 'women' ? styles.genderBtnActiveWomen : ''}`}
-              onClick={() => setGender('women')}
-            >
-              {isAr ? 'حريمي' : "Women's"}
-            </button>
-          </div>
+          {PRODUCT?.colors?.some((c: any) => Array.isArray(c.femaleImages) && c.femaleImages.length > 0) && (
+            <div className={styles.genderToggleContainer}>
+              <button 
+                className={`${styles.genderBtn} ${gender === 'men' ? styles.genderBtnActiveMen : ''}`}
+                onClick={() => setGender('men')}
+              >
+                {isAr ? 'رجالي' : "Men's"}
+              </button>
+              <button 
+                className={`${styles.genderBtn} ${gender === 'women' ? styles.genderBtnActiveWomen : ''}`}
+                onClick={() => setGender('women')}
+              >
+                {isAr ? 'حريمي' : "Women's"}
+              </button>
+            </div>
+          )}
 
           <p className={styles.price}>{PRODUCT.price} {isAr ? 'جنيه' : 'EGP'}</p>
           

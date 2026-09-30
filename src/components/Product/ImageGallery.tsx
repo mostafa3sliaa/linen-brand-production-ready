@@ -176,7 +176,7 @@ export default function ImageGallery({ colors, activeColorId, onColorChange, isA
                   src={item.src} 
                   alt={item.label}
                   className={`${styles.mainImage} ${isZooming && activeIndex === idx ? styles.zoomed : ''}`}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover', ...(isZooming && activeIndex === idx ? zoomStyle : {}) }}
+                  style={{ width: '100%', height: '100%', objectFit: 'contain', ...(isZooming && activeIndex === idx ? zoomStyle : {}) }}
                 />
               ) : (
                 <Image 
@@ -186,7 +186,7 @@ export default function ImageGallery({ colors, activeColorId, onColorChange, isA
                   unoptimized
                   sizes="(max-width: 768px) 100vw, 50vw"
                   className={`${styles.mainImage} ${isZooming && activeIndex === idx ? styles.zoomed : ''}`}
-                  style={{ objectFit: 'cover', ...(isZooming && activeIndex === idx ? zoomStyle : {}) }}
+                  style={{ objectFit: 'contain', ...(isZooming && activeIndex === idx ? zoomStyle : {}) }}
                   priority={idx === 0}
                 />
               )}
