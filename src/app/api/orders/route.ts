@@ -64,7 +64,11 @@ export async function POST(req: Request) {
     ).join('\n');
 
     const productsTotal = data.items.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0);
-    const shippingFee = 50;
+    const shippingFee = typeof data.shippingFee === 'number' 
+      ? data.shippingFee 
+      : (typeof data.shipping === 'number' 
+          ? data.shipping 
+          : (Number(data.shippingFee ?? data.shipping) || 50));
     const finalTotal = productsTotal + shippingFee;
 
     const rowData = [
@@ -87,7 +91,7 @@ export async function POST(req: Request) {
       fetch(process.env.WEBHOOK_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ orderId, ...data })
+        body: JSON.stringify({ orderId, shippingFee, finalTotal, ...data })
       }).catch(e => console.error("Webhook failed:", e));
     }
 
@@ -98,13 +102,13 @@ export async function POST(req: Request) {
     }
     
     // WhatsApp Notification
-    await sendWhatsAppNotification({ orderId, ...data }).catch(async (e) => {
+    await sendWhatsAppNotification({ orderId, shippingFee, finalTotal, ...data }).catch(async (e) => {
       console.error("WhatsApp failed", e);
-      await saveToQueue("whatsapp_notification", { orderId, ...data });
+      await saveToQueue("whatsapp_notification", { orderId, shippingFee, finalTotal, ...data });
     });
 
     // Telegram Notification
-    await sendTelegramNotification(data).catch(e => console.error("Telegram failed", e));
+    await sendTelegramNotification({ ...data, shippingFee, finalTotal }).catch(e => console.error("Telegram failed", e));
 
     return NextResponse.json({ success: true, orderId }, { status: 201 });
   } catch (error) {

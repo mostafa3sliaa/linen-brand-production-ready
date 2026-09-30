@@ -5,6 +5,9 @@ export const orderSchema = z.object({
   phone: z.string().regex(/^01[0125][0-9]{8}$/, "Invalid Egyptian phone number"),
   address: z.string().min(5, "Detailed address is required"),
   notes: z.string().optional().default(""),
+  governorate: z.string().optional().default(""),
+  shippingFee: z.number().optional(),
+  shipping: z.number().optional(),
   items: z.array(z.object({
     productName: z.string(),
     color: z.string(),

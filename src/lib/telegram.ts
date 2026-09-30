@@ -12,13 +12,19 @@ export async function sendTelegramNotification(orderData: any) {
     return `${shortName} ${item.color} ${item.size} - الكمية ${item.quantity} - السعر ${item.price}`;
   }).join('\n');
 
-  const total = orderData.items.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0) + 50;
+  const shipping = typeof orderData.shippingFee === 'number' 
+    ? orderData.shippingFee 
+    : (typeof orderData.shipping === 'number' ? orderData.shipping : 50);
+  const total = orderData.finalTotal 
+    ? orderData.finalTotal 
+    : (orderData.items.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0) + shipping);
 
   const text = `الاسم: ${orderData.customerName}
 الموبايل: ${orderData.phone}
 المحافظة: ${orderData.governorate}
 العنوان: ${orderData.address}
-الشحن: 50
+الشحن: ${shipping}
+الإجمالي: ${total}
 ملاحظات: ${orderData.notes || ""}
 المنتجات:
 ${itemsString}

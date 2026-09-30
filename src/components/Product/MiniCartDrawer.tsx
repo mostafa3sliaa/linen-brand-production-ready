@@ -16,6 +16,7 @@ type Props = {
   isOpen: boolean;
   onClose: () => void;
   cart: CartItem[];
+  shipping?: number;
   updateQuantity: (id: string, delta: number) => void;
   removeItem: (id: string) => void;
   onCheckout: () => void;
@@ -29,6 +30,7 @@ export default function MiniCartDrawer({
   isOpen,
   onClose,
   cart,
+  shipping = 50,
   updateQuantity,
   removeItem,
   onCheckout,
@@ -62,8 +64,8 @@ export default function MiniCartDrawer({
   }, [isOpen]);
 
   const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const shipping = 50;
-  const total = subtotal > 0 ? subtotal + shipping : 0;
+  const shippingFee = typeof shipping === 'number' ? shipping : 50;
+  const total = subtotal > 0 ? subtotal + shippingFee : 0;
 
   if (!isOpen && cart.length === 0) return null; // Fully unmount if empty and closed to save DOM
 
@@ -159,7 +161,7 @@ export default function MiniCartDrawer({
             </div>
             <div className={styles.summaryRow}>
               <span>{isAr ? 'الشحن' : 'Shipping'}</span>
-              <span>{shipping} {isAr ? 'ج.م' : 'EGP'}</span>
+              <span>{shippingFee} {isAr ? 'ج.م' : 'EGP'}</span>
             </div>
             <div className={`${styles.summaryRow} ${styles.totalRow}`}>
               <span>{isAr ? 'الإجمالي' : 'Total'}</span>

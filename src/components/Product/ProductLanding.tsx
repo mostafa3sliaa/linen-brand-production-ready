@@ -29,6 +29,7 @@ type CartItem = {
 export default function ProductLanding({ lang, initialProduct }: { lang: string; initialProduct?: any }) {
   const isAr = lang === 'ar';
   const PRODUCT = initialProduct || productsData.products[0];
+  const productShipping = typeof PRODUCT?.shipping === 'number' ? PRODUCT.shipping : (Number(PRODUCT?.shipping) || 50);
   const defaultColor = PRODUCT?.colors?.[0] || { id: 'default', label: { ar: 'افتراضي', en: 'Default' }, hex: '#000', images: ['/images/black-suit.jpg'] };
   const defaultSize = PRODUCT?.sizes?.[0] || 'L';
 
@@ -167,6 +168,8 @@ export default function ProductLanding({ lang, initialProduct }: { lang: string;
         governorate: formData.governorate,
         address: formData.address,
         notes: formData.notes,
+        shippingFee: productShipping,
+        shipping: productShipping,
         items: cart.map(item => ({
           productName: isAr ? PRODUCT.name.ar : PRODUCT.name.en,
           color: item.colorLabel,
@@ -209,7 +212,7 @@ export default function ProductLanding({ lang, initialProduct }: { lang: string;
 
   const cartItemsCount = cart.reduce((sum, item) => sum + item.quantity, 0);
   const cartSubtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const cartTotal = cartSubtotal > 0 ? cartSubtotal + PRODUCT.shipping : 0;
+  const cartTotal = cartSubtotal > 0 ? cartSubtotal + productShipping : 0;
 
   return (
     <div className={styles.container}>
@@ -383,6 +386,14 @@ export default function ProductLanding({ lang, initialProduct }: { lang: string;
               />
               
               <div className={styles.summary}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', color: '#666', marginBottom: '6px' }}>
+                  <span>{isAr ? 'قيمة المنتجات' : 'Products Subtotal'}</span>
+                  <span>{cartSubtotal} {isAr ? 'ج.م' : 'EGP'}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '14px', color: '#666', marginBottom: '10px' }}>
+                  <span>{isAr ? 'مصاريف الشحن' : 'Shipping'}</span>
+                  <span>{productShipping} {isAr ? 'ج.م' : 'EGP'}</span>
+                </div>
                 <div className={styles.summaryTotal}>
                   <span>{isAr ? 'الإجمالي المطلوب' : 'Total Required'}</span>
                   <span>{cartTotal} {isAr ? 'ج.م' : 'EGP'}</span>
@@ -416,7 +427,7 @@ export default function ProductLanding({ lang, initialProduct }: { lang: string;
                 <div className={styles.invoiceDivider}></div>
                 <div className={styles.invoiceRow}>
                   <span>{isAr ? 'الشحن' : 'Shipping'}</span>
-                  <span>{PRODUCT.shipping} {isAr ? 'ج.م' : 'EGP'}</span>
+                  <span>{productShipping} {isAr ? 'ج.م' : 'EGP'}</span>
                 </div>
                 <div className={`${styles.invoiceRow} ${styles.invoiceTotal}`}>
                   <span>{isAr ? 'الإجمالي' : 'Total'}</span>
@@ -461,6 +472,7 @@ export default function ProductLanding({ lang, initialProduct }: { lang: string;
         isOpen={isCartOpen}
         onClose={() => setIsCartOpen(false)}
         cart={cart}
+        shipping={productShipping}
         updateQuantity={updateQuantity}
         removeItem={removeItem}
         onCheckout={handleCheckoutClick}
