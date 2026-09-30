@@ -16,9 +16,6 @@ declare global {
   }
 }
 
-// In a real app we'd fetch by ID. Here we just take the first product.
-const PRODUCT = productsData.products[0];
-
 type CartItem = {
   id: string;
   colorId: string;
@@ -29,10 +26,19 @@ type CartItem = {
   price: number;
 };
 
-export default function ProductLanding({ lang }: { lang: string }) {
+export default function ProductLanding({ lang, initialProduct }: { lang: string; initialProduct?: any }) {
   const isAr = lang === 'ar';
-  const [activeColor, setActiveColor] = useState(PRODUCT.colors[0]);
-  const [activeSize, setActiveSize] = useState(PRODUCT.sizes[0]);
+  const PRODUCT = initialProduct || productsData.products[0];
+  const defaultColor = PRODUCT?.colors?.[0] || { id: 'default', label: { ar: 'افتراضي', en: 'Default' }, hex: '#000', images: ['/images/black-suit.jpg'] };
+  const defaultSize = PRODUCT?.sizes?.[0] || 'L';
+
+  const [activeColor, setActiveColor] = useState(defaultColor);
+  const [activeSize, setActiveSize] = useState(defaultSize);
+
+  useEffect(() => {
+    if (PRODUCT?.colors?.[0]) setActiveColor(PRODUCT.colors[0]);
+    if (PRODUCT?.sizes?.[0]) setActiveSize(PRODUCT.sizes[0]);
+  }, [PRODUCT?.id]);
   
   // Modals / Drawers state
   const [isCartOpen, setIsCartOpen] = useState(false);
@@ -242,7 +248,7 @@ export default function ProductLanding({ lang }: { lang: string }) {
           
           {/* Bullet points under price */}
           <ul className={styles.featuresList}>
-            {(isAr ? PRODUCT.features.ar : PRODUCT.features.en).map((feature, idx) => (
+            {(isAr ? PRODUCT?.features?.ar : PRODUCT?.features?.en)?.map((feature: any, idx: number) => (
               <li key={idx}>✓ {feature}</li>
             ))}
           </ul>
@@ -250,12 +256,12 @@ export default function ProductLanding({ lang }: { lang: string }) {
           <div className={styles.section}>
             <h3 className={styles.sectionTitle}>{isAr ? 'اللون' : 'Color'}: <span>{isAr ? activeColor.label.ar : activeColor.label.en}</span></h3>
             <div className={styles.colorOptions}>
-              {PRODUCT.colors.map(color => (
+              {PRODUCT?.colors?.map((color: any) => (
                 <button
                   key={color.id}
                   onClick={() => setActiveColor(color)}
                   className={`${styles.colorBtn} ${activeColor.id === color.id ? styles.activeColor : ''}`}
-                  style={{ backgroundColor: color.id === 'black' ? '#000' : color.id === 'white' ? '#fff' : '#d2b48c' }}
+                  style={{ backgroundColor: color.id === 'black' ? '#000' : color.id === 'white' ? '#fff' : color.hex || '#d2b48c' }}
                   aria-label={isAr ? color.label.ar : color.label.en}
                 />
               ))}
@@ -270,7 +276,7 @@ export default function ProductLanding({ lang }: { lang: string }) {
               </button>
             </div>
             <div className={styles.sizeOptions}>
-              {PRODUCT.sizes.map(size => (
+              {PRODUCT?.sizes?.map((size: any) => (
                 <button
                   key={size}
                   onClick={() => setActiveSize(size)}
@@ -282,17 +288,19 @@ export default function ProductLanding({ lang }: { lang: string }) {
             </div>
 
             {/* Dynamic Size Info */}
-            <div className={styles.dynamicSizeInfo}>
-              <div className={styles.sizeInfoWeight}>
-                <span>{isAr ? 'الوزن المناسب:' : 'Ideal Weight:'}</span>
-                <strong>{PRODUCT.sizeChart[activeSize as keyof typeof PRODUCT.sizeChart].weight}</strong>
+            {PRODUCT?.sizeChart?.[activeSize] && (
+              <div className={styles.dynamicSizeInfo}>
+                <div className={styles.sizeInfoWeight}>
+                  <span>{isAr ? 'الوزن المناسب:' : 'Ideal Weight:'}</span>
+                  <strong>{PRODUCT.sizeChart[activeSize]?.weight || '-'}</strong>
+                </div>
+                <div className={styles.sizeMeasurements}>
+                  {PRODUCT.sizeChart[activeSize]?.shirtWidth && <span>{isAr ? 'عرض القميص' : 'Shirt Width'}: {PRODUCT.sizeChart[activeSize]?.shirtWidth} {isAr ? 'سم' : 'cm'}</span>}
+                  {PRODUCT.sizeChart[activeSize]?.shirtLength && <span>{isAr ? 'طول القميص' : 'Shirt Length'}: {PRODUCT.sizeChart[activeSize]?.shirtLength} {isAr ? 'سم' : 'cm'}</span>}
+                  {PRODUCT.sizeChart[activeSize]?.pantsLength && <span>{isAr ? 'طول البنطلون' : 'Pants Length'}: {PRODUCT.sizeChart[activeSize]?.pantsLength} {isAr ? 'سم' : 'cm'}</span>}
+                </div>
               </div>
-              <div className={styles.sizeMeasurements}>
-                <span>{isAr ? 'عرض القميص' : 'Shirt Width'}: {PRODUCT.sizeChart[activeSize as keyof typeof PRODUCT.sizeChart].shirtWidth} {isAr ? 'سم' : 'cm'}</span>
-                <span>{isAr ? 'طول القميص' : 'Shirt Length'}: {PRODUCT.sizeChart[activeSize as keyof typeof PRODUCT.sizeChart].shirtLength} {isAr ? 'سم' : 'cm'}</span>
-                <span>{isAr ? 'طول البنطلون' : 'Pants Length'}: {PRODUCT.sizeChart[activeSize as keyof typeof PRODUCT.sizeChart].pantsLength} {isAr ? 'سم' : 'cm'}</span>
-              </div>
-            </div>
+            )}
           </div>
 
           <button className={styles.ctaBtn} onClick={() => addToCart()}>

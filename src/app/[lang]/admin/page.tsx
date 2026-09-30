@@ -1,10 +1,15 @@
 "use client";
 import { useState, useEffect, useMemo } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
 import styles from './AdminDashboard.module.css';
 
 export default function AdminDashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
+  const [activeTab, setActiveTab] = useState<'orders' | 'products' | 'settings'>('orders');
+
+  // Orders State
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [viewOrder, setViewOrder] = useState<any | null>(null);
@@ -12,11 +17,41 @@ export default function AdminDashboard() {
   const [filterDate, setFilterDate] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
+  // Products State
+  const [products, setProducts] = useState<any[]>([]);
+  const [loadingProducts, setLoadingProducts] = useState(false);
+  const [isAddProductOpen, setIsAddProductOpen] = useState(false);
+  const [productSuccessMsg, setProductSuccessMsg] = useState('');
+
+  // New Product Form State
+  const [newProduct, setNewProduct] = useState({
+    id: '',
+    nameAr: '',
+    nameEn: '',
+    price: 650,
+    shipping: 50,
+    featuresAr: 'خامة كتان فاخرة\nمناسب لكل الأوقات\nألوان أنيقة وعصرية',
+    colorNameAr: 'أسود',
+    colorHex: '#000000',
+    colorImage: '/images/black-suit.jpg',
+  });
+
+  // Settings State
+  const [settings, setSettings] = useState({
+    fbPixelId: '',
+    tiktokPixelId: '',
+    snapPixelId: ''
+  });
+  const [savingSettings, setSavingSettings] = useState(false);
+  const [settingsSavedMsg, setSettingsSavedMsg] = useState('');
+
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     if (password === '1234') {
       setIsAuthenticated(true);
       fetchOrders();
+      fetchProducts();
+      fetchSettings();
     } else {
       alert("كلمة المرور غير صحيحة");
     }
@@ -34,6 +69,32 @@ export default function AdminDashboard() {
       console.error("Failed to fetch orders", err);
     }
     setLoading(false);
+  };
+
+  const fetchProducts = async () => {
+    setLoadingProducts(true);
+    try {
+      const res = await fetch('/api/products');
+      const data = await res.json();
+      if (data?.products) {
+        setProducts(data.products);
+      }
+    } catch (err) {
+      console.error("Failed to fetch products", err);
+    }
+    setLoadingProducts(false);
+  };
+
+  const fetchSettings = async () => {
+    try {
+      const res = await fetch('/api/settings');
+      const data = await res.json();
+      if (data?.settings) {
+        setSettings(data.settings);
+      }
+    } catch (err) {
+      console.error("Failed to fetch settings", err);
+    }
   };
 
   const updateStatus = async (orderIds: string[], status: string) => {
@@ -57,6 +118,134 @@ export default function AdminDashboard() {
     const newOrderIds = orders.filter(o => o['الحالة'] === 'New').map(o => o['رقم الطلب']);
     if (newOrderIds.length > 0) {
       updateStatus(newOrderIds, 'Processed');
+    }
+  };
+
+  // Helper to extract clean ID if user pasted full URL or snippet
+  const extractPixelId = (input: string) => {
+    if (!input) return '';
+    const trimmed = input.trim();
+    const match = trimmed.match(/\b\d{10,20}\b/);
+    return match ? match[0] : trimmed;
+  };
+
+  const handleSaveSettings = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSavingSettings(true);
+    try {
+      const res = await fetch('/api/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ settings })
+      });
+      const data = await res.json();
+      if (data.success || res.ok) {
+        setSettingsSavedMsg('تم حفظ وتحديث البيكسل بنجاح! يعمل الآن على كامل المتجر ✓');
+        setTimeout(() => setSettingsSavedMsg(''), 4000);
+      } else {
+        alert('حدث خطأ أثناء حفظ الإعدادات');
+      }
+    } catch (err) {
+      console.error("Error saving settings", err);
+      alert('حدث خطأ غير متوقع');
+    }
+    setSavingSettings(false);
+  };
+
+  const handleCreateProduct = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newProduct.nameAr) {
+      alert("يرجى كتابة اسم المنتج بالعربي");
+      return;
+    }
+
+    const slug = newProduct.id.trim() || `prod-${Date.now()}`;
+    const featuresList = newProduct.featuresAr
+      .split('\n')
+      .map(f => f.trim())
+      .filter(Boolean);
+
+    const productPayload = {
+      id: slug,
+      name: {
+        ar: newProduct.nameAr,
+        en: newProduct.nameEn || newProduct.nameAr,
+      },
+      price: Number(newProduct.price) || 650,
+      shipping: Number(newProduct.shipping) || 50,
+      features: {
+        ar: featuresList.length > 0 ? featuresList : ['خامة عالية الجودة', 'تصميم عصري'],
+        en: ['Premium Quality', 'Modern Design']
+      },
+      colors: [
+        {
+          id: 'primary',
+          label: { ar: newProduct.colorNameAr || 'أساسي', en: 'Primary' },
+          hex: newProduct.colorHex || '#000000',
+          images: [newProduct.colorImage || '/images/black-suit.jpg'],
+        }
+      ],
+      sizes: ['M', 'L', 'XL', '2XL', '3XL', '4XL'],
+      sizeChart: {
+        "M": { shirtWidth: 52, shirtLength: 68, pantsLength: 98, weight: "من 50 كيلو إلى 60 كيلو" },
+        "L": { shirtWidth: 54, shirtLength: 70, pantsLength: 99, weight: "من 60 كيلو إلى 70 كيلو" },
+        "XL": { shirtWidth: 56, shirtLength: 70, pantsLength: 100, weight: "من 70 كيلو إلى 80 كيلو" },
+        "2XL": { shirtWidth: 58, shirtLength: 72, pantsLength: 100, weight: "من 80 كيلو إلى 90 كيلو" },
+        "3XL": { shirtWidth: 60, shirtLength: 72, pantsLength: 102, weight: "من 90 كيلو إلى 100 كيلو" },
+        "4XL": { shirtWidth: 62, shirtLength: 75, pantsLength: 102, weight: "من 100 كيلو إلى 110 كيلو" },
+      }
+    };
+
+    try {
+      const res = await fetch('/api/products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ product: productPayload })
+      });
+      const data = await res.json();
+      if (data.success || res.ok) {
+        setIsAddProductOpen(false);
+        setProductSuccessMsg(`تمت إضافة ونشر المنتج "${newProduct.nameAr}" بنجاح!`);
+        setTimeout(() => setProductSuccessMsg(''), 5000);
+        fetchProducts();
+        // Reset form
+        setNewProduct({
+          id: '',
+          nameAr: '',
+          nameEn: '',
+          price: 650,
+          shipping: 50,
+          featuresAr: 'خامة كتان فاخرة\nمناسب لكل الأوقات\nألوان أنيقة وعصرية',
+          colorNameAr: 'أسود',
+          colorHex: '#000000',
+          colorImage: '/images/black-suit.jpg',
+        });
+      } else {
+        alert("فشل في إضافة المنتج: " + (data.error || "خطأ غير معروف"));
+      }
+    } catch (err) {
+      console.error("Error creating product:", err);
+      alert("حدث خطأ أثناء إضافة المنتج");
+    }
+  };
+
+  const handleDeleteProduct = async (id: string, name: string) => {
+    if (!confirm(`هل أنت متأكد من رغبتك في حذف المنتج: "${name}"؟`)) {
+      return;
+    }
+    try {
+      const res = await fetch(`/api/products?id=${encodeURIComponent(id)}`, {
+        method: 'DELETE'
+      });
+      const data = await res.json();
+      if (data.success || res.ok) {
+        fetchProducts();
+      } else {
+        alert(data.error || "فشل حذف المنتج");
+      }
+    } catch (err) {
+      console.error("Error deleting product:", err);
+      alert("حدث خطأ أثناء الحذف");
     }
   };
 
@@ -110,161 +299,508 @@ export default function AdminDashboard() {
     <div className={styles.container}>
       <div className={styles.wrapper}>
         
-        <div className={styles.header}>
-          <div className={styles.headerLeft}>
-            <h1 className={styles.title}>الطلبات الواردة</h1>
-            
-            <div className={styles.filterGroup}>
-              <input
-                type="text"
-                placeholder="بحث بالاسم أو رقم الموبايل..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className={styles.searchInput}
-              />
-              <select 
-                value={filterDate} 
-                onChange={(e) => setFilterDate(e.target.value)}
-                className={styles.dateFilter}
-              >
-                <option value="All">كل التواريخ</option>
-                {uniqueDates.map(date => (
-                  <option key={date} value={date}>{date}</option>
-                ))}
-              </select>
+        {/* Navigation Tabs */}
+        <div className={styles.tabsNav}>
+          <button 
+            className={`${styles.tabBtn} ${activeTab === 'orders' ? styles.tabBtnActive : ''}`}
+            onClick={() => setActiveTab('orders')}
+          >
+            <span>📦</span> الطلبات الواردة ({filteredOrders.length})
+          </button>
+          <button 
+            className={`${styles.tabBtn} ${activeTab === 'products' ? styles.tabBtnActive : ''}`}
+            onClick={() => setActiveTab('products')}
+          >
+            <span>🏷️</span> إدارة المنتجات ({products.length})
+          </button>
+          <button 
+            className={`${styles.tabBtn} ${activeTab === 'settings' ? styles.tabBtnActive : ''}`}
+            onClick={() => setActiveTab('settings')}
+          >
+            <span>⚙️</span> إعدادات البيكسل والتتبع
+          </button>
+        </div>
+
+        {/* Success Notifications */}
+        {productSuccessMsg && (
+          <div className={styles.successBanner}>
+            <span>✓</span> {productSuccessMsg}
+          </div>
+        )}
+
+        {/* TAB 1: ORDERS */}
+        {activeTab === 'orders' && (
+          <>
+            <div className={styles.header}>
+              <div className={styles.headerLeft}>
+                <h1 className={styles.title}>الطلبات الواردة</h1>
+                
+                <div className={styles.filterGroup}>
+                  <input
+                    type="text"
+                    placeholder="بحث بالاسم أو رقم الموبايل..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className={styles.searchInput}
+                  />
+                  <select 
+                    value={filterDate} 
+                    onChange={(e) => setFilterDate(e.target.value)}
+                    className={styles.dateFilter}
+                  >
+                    <option value="All">كل التواريخ</option>
+                    {uniqueDates.map(date => (
+                      <option key={date} value={date}>{date}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <button onClick={markAllProcessed} className={styles.secondaryBtn}>
+                  تحديد الكل كـ مقروء ✓
+                </button>
+              </div>
+              <a href={`/api/orders/export${filterDate !== 'All' ? `?date=${encodeURIComponent(filterDate)}` : ''}`} className={styles.exportBtn} download>
+                <span>📥</span> تحميل ملف إكسيل
+              </a>
             </div>
 
-            <button onClick={markAllProcessed} className={styles.secondaryBtn}>
-              تحديد الكل كـ مقروء ✓
-            </button>
-          </div>
-          <a href={`/api/orders/export${filterDate !== 'All' ? `?date=${encodeURIComponent(filterDate)}` : ''}`} className={styles.exportBtn} download>
-            <span>📥</span> تحميل ملف إكسيل
-          </a>
-        </div>
+            <div className={styles.statsContainer}>
+              <div className={styles.statCard}>
+                <span className={styles.statLabel}>إجمالي الطلبات</span>
+                <span className={styles.statValue}>{filteredOrders.length}</span>
+              </div>
+              <div className={`${styles.statCard} ${styles.new}`}>
+                <span className={styles.statLabel}>الطلبات الجديدة</span>
+                <span className={styles.statValue}>{filteredOrders.filter(o => o['الحالة'] === 'New').length}</span>
+              </div>
+              <div className={`${styles.statCard} ${styles.processed}`}>
+                <span className={styles.statLabel}>تم التسليم (مقروء)</span>
+                <span className={styles.statValue}>{filteredOrders.filter(o => o['الحالة'] === 'Processed').length}</span>
+              </div>
+            </div>
 
-        <div className={styles.statsContainer}>
-          <div className={styles.statCard}>
-            <span className={styles.statLabel}>إجمالي الطلبات</span>
-            <span className={styles.statValue}>{filteredOrders.length}</span>
-          </div>
-          <div className={`${styles.statCard} ${styles.new}`}>
-            <span className={styles.statLabel}>الطلبات الجديدة</span>
-            <span className={styles.statValue}>{filteredOrders.filter(o => o['الحالة'] === 'New').length}</span>
-          </div>
-          <div className={`${styles.statCard} ${styles.processed}`}>
-            <span className={styles.statLabel}>تم التسليم (مقروء)</span>
-            <span className={styles.statValue}>{filteredOrders.filter(o => o['الحالة'] === 'Processed').length}</span>
-          </div>
-        </div>
-
-        <div className={styles.card}>
-          {loading ? (
-            <div className={styles.loading}>جاري تحميل الطلبات...</div>
-          ) : filteredOrders.length === 0 ? (
-            <div className={styles.emptyState}>لا توجد طلبات في هذا التاريخ.</div>
-          ) : (
-            <div className={styles.tableWrapper}>
-              <table className={styles.table}>
-                <thead>
-                  <tr>
-                    <th>التاريخ</th>
-                    <th>العميل</th>
-                    <th>العنوان</th>
-                    <th>الطلبات</th>
-                    <th>الحساب</th>
-                    <th>ملاحظات</th>
-                    <th>الحالة والإجراء</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredOrders.map((order, idx) => (
-                    <tr key={idx} className={order['الحالة'] === 'Processed' ? styles.processedRow : ''}>
-                      <td>
-                        <div style={{ fontSize: '0.85em', whiteSpace: 'nowrap' }}>{order['التاريخ والوقت']?.split(' ')[0]}</div>
-                        <div style={{ fontSize: '0.85em', color: '#666', whiteSpace: 'nowrap' }}>{order['التاريخ والوقت']?.split(' ')[1]}</div>
-                      </td>
-                      <td style={{ whiteSpace: 'nowrap' }}>
-                        <div style={{ fontWeight: 600 }}>{order['اسم العميل']}</div>
-                        <div style={{ fontSize: '0.9em', color: '#555' }} dir="ltr">{order['رقم الهاتف']}</div>
-                      </td>
-                      <td style={{ minWidth: '150px' }}>{order['العنوان التفصيلي']}</td>
-                      <td className={styles.itemsCol} style={{ whiteSpace: 'pre-line' }}>
-                        {order['المنتجات']}
-                      </td>
-                      <td style={{ whiteSpace: 'nowrap', fontSize: '0.9em', lineHeight: 1.6 }}>
-                        <div>منتجات: <strong>{order['إجمالي المنتجات'] ? `${order['إجمالي المنتجات']} ج.م` : '-'}</strong></div>
-                        <div>شحن: <strong>{order['مصاريف الشحن'] ? `${order['مصاريف الشحن']} ج.م` : '-'}</strong></div>
-                        <div style={{ color: '#115e34', marginTop: '4px', borderTop: '1px solid #ddd', paddingTop: '2px' }}>
-                          إجمالي: <strong>{order['الإجمالي الكلي'] ? `${order['الإجمالي الكلي']} ج.م` : '-'}</strong>
-                        </div>
-                      </td>
-                      <td>{order['ملاحظات']}</td>
-                      <td style={{ verticalAlign: 'middle' }}>
-                        <div className={styles.actionCell} style={{ flexDirection: 'column', gap: '8px', alignItems: 'center' }}>
-                          <span className={`${styles.statusBadge} ${order['الحالة'] === 'Processed' ? styles.badgeProcessed : ''}`}>
-                            {order['الحالة'] === 'Processed' ? 'تم' : 'جديد'}
-                          </span>
-                          <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                            <label className={styles.switch}>
-                              <input 
-                                type="checkbox" 
-                                checked={order['الحالة'] === 'Processed'}
-                                onChange={(e) => updateStatus([order['رقم الطلب']], e.target.checked ? 'Processed' : 'New')}
-                              />
-                              <span className={styles.slider}></span>
-                            </label>
-                            <button onClick={() => setViewOrder(order)} className={styles.iconBtn} title="عرض ونسخ">
-                              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                            </button>
-                          </div>
-                        </div>
-                      </td>
+            {loading ? (
+              <div className={styles.loading}>جاري جلب الطلبات...</div>
+            ) : filteredOrders.length === 0 ? (
+              <div className={styles.emptyState}>لا توجد طلبات مطابقة للبحث أو التاريخ.</div>
+            ) : (
+              <div className={styles.tableResponsive}>
+                <table className={styles.table}>
+                  <thead>
+                    <tr>
+                      <th>الحالة</th>
+                      <th>التاريخ والوقت</th>
+                      <th>العميل والهاتف</th>
+                      <th>العنوان</th>
+                      <th>المنتج والمقاس</th>
+                      <th>الأسعار والشحن</th>
+                      <th>الإجراء</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {filteredOrders.map((order, idx) => {
+                      const isNew = order['الحالة'] === 'New';
+                      return (
+                        <tr key={idx} className={isNew ? styles.newRow : ''}>
+                          <td>
+                            <select
+                              value={order['الحالة']}
+                              onChange={(e) => updateStatus([order['رقم الطلب']], e.target.value)}
+                              className={`${styles.statusSelect} ${styles[order['الحالة'].toLowerCase()]}`}
+                            >
+                              <option value="New">جديد</option>
+                              <option value="Processed">تم</option>
+                              <option value="Cancelled">ملغي</option>
+                            </select>
+                          </td>
+                          <td className={styles.dateTimeCell}>
+                            <div className={styles.dateText}>{(order['التاريخ والوقت'] || '').split(' ')[0]}</div>
+                            <div className={styles.timeText}>{(order['التاريخ والوقت'] || '').split(' ')[1] || ''}</div>
+                          </td>
+                          <td>
+                            <div className={styles.customerName}>{order['اسم العميل']}</div>
+                            <div className={styles.customerPhone}>{order['رقم الهاتف']}</div>
+                          </td>
+                          <td className={styles.addressCell}>
+                            <div className={styles.govTag}>{order['المحافظة']}</div>
+                            <div className={styles.addressText}>{order['العنوان بالتفصيل']}</div>
+                          </td>
+                          <td className={styles.itemsCell}>
+                            <pre className={styles.preItems}>{order['المنتجات']}</pre>
+                          </td>
+                          <td className={styles.priceCell}>
+                            <div>منتجات: {order['سعر المنتجات'] ? `${order['سعر المنتجات']} ج` : '-'}</div>
+                            <div>شحن: {order['الشحن'] ? `${order['الشحن']} ج` : '-'}</div>
+                            <div className={styles.totalPrice}>الإجمالي: {order['الإجمالي الكلي'] ? `${order['الإجمالي الكلي']} ج` : '-'}</div>
+                          </td>
+                          <td>
+                            <div className={styles.actionCell}>
+                              <button 
+                                className={styles.iconBtn}
+                                title="عرض ونسخ تفاصيل الطلب"
+                                onClick={() => {
+                                  setViewOrder(order);
+                                  setCopied(false);
+                                }}
+                              >
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                  <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </>
+        )}
+
+        {/* TAB 2: PRODUCTS */}
+        {activeTab === 'products' && (
+          <div>
+            <div className={styles.productsHeader}>
+              <div>
+                <h1 className={styles.title}>إدارة المنتجات</h1>
+                <p style={{ color: '#6c757d', fontSize: '14px', marginTop: '4px' }}>
+                  يمكنك إضافة أي منتج جديد وسيتم إنشاء صفحة متكاملة له ورابط مخصص للإعلانات تلقائياً!
+                </p>
+              </div>
+              <button 
+                onClick={() => setIsAddProductOpen(true)}
+                className={styles.addProductBtn}
+              >
+                <span>+</span> إضافة منتج جديد
+              </button>
             </div>
-          )}
-        </div>
+
+            {loadingProducts ? (
+              <div className={styles.loading}>جاري جلب المنتجات...</div>
+            ) : products.length === 0 ? (
+              <div className={styles.emptyState}>لا توجد منتجات مسجلة حتى الآن.</div>
+            ) : (
+              <div className={styles.productGrid}>
+                {products.map((p, idx) => {
+                  const mainImg = p.colors?.[0]?.images?.[0] || '/images/black-suit.jpg';
+                  return (
+                    <div key={p.id || idx} className={styles.productCard}>
+                      <div className={styles.productImageWrap}>
+                        <Image 
+                          src={mainImg} 
+                          alt={p.name.ar} 
+                          fill 
+                          sizes="300px" 
+                          style={{ objectFit: 'cover' }} 
+                        />
+                      </div>
+                      <div className={styles.productCardBody}>
+                        <h3 className={styles.productCardTitle}>{p.name.ar}</h3>
+                        <div className={styles.productCardPrice}>{p.price} جنيه (+ {p.shipping || 50} شحن)</div>
+                        
+                        <div className={styles.productCardBadges}>
+                          <span style={{ fontSize: '12px', fontWeight: 600, color: '#6c757d' }}>الألوان:</span>
+                          {p.colors?.map((c: any, cIdx: number) => (
+                            <span 
+                              key={cIdx} 
+                              className={styles.colorBadge} 
+                              style={{ backgroundColor: c.hex }} 
+                              title={c.label?.ar}
+                            />
+                          ))}
+                          <span style={{ fontSize: '12px', fontWeight: 600, color: '#6c757d', marginRight: '8px' }}>المقاسات:</span>
+                          <span className={styles.sizeBadge}>{p.sizes?.join(' - ') || 'M إلى 6XL'}</span>
+                        </div>
+
+                        <div className={styles.productCardActions}>
+                          <Link 
+                            href={`/ar/p/${p.id}`} 
+                            target="_blank"
+                            className={styles.viewProductLink}
+                          >
+                            👁️ فتح صفحة المنتج
+                          </Link>
+                          {products.length > 1 && (
+                            <button 
+                              onClick={() => handleDeleteProduct(p.id, p.name.ar)}
+                              className={styles.deleteProductBtn}
+                              title="حذف المنتج"
+                            >
+                              🗑️ حذف
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* TAB 3: SETTINGS & PIXELS */}
+        {activeTab === 'settings' && (
+          <div className={styles.settingsCard}>
+            <h2 className={styles.settingsTitle}>إعدادات بيكسل منصات الإعلانات</h2>
+            <p className={styles.settingsSubtitle}>
+              ضع معرّف البيكسل (Pixel ID) الخاص بالحساب الإعلاني، أو انسخ الرابط كاملاً وسيقوم النظام باستخراجه تلقائياً. بمجرد الحفظ، سيبدأ المتجر فوراً بتتبع الزوار وطلبات الشراء!
+            </p>
+
+            {settingsSavedMsg && (
+              <div className={styles.successBanner}>
+                {settingsSavedMsg}
+              </div>
+            )}
+
+            <form onSubmit={handleSaveSettings}>
+              {/* Facebook Pixel */}
+              <div className={styles.settingField}>
+                <label className={styles.settingLabel}>
+                  <span>🔵</span> Facebook Pixel ID / Dataset ID
+                </label>
+                <input 
+                  type="text" 
+                  value={settings.fbPixelId}
+                  onChange={(e) => {
+                    const extracted = extractPixelId(e.target.value);
+                    setSettings({ ...settings, fbPixelId: extracted });
+                  }}
+                  placeholder="مثال: 1726555298615011"
+                  className={styles.settingInput}
+                />
+                <p className={styles.settingHelp}>
+                  الرقم النشط حالياً: <strong>{settings.fbPixelId || 'لم يتم الضبط'}</strong>
+                </p>
+              </div>
+
+              {/* TikTok Pixel */}
+              <div className={styles.settingField}>
+                <label className={styles.settingLabel}>
+                  <span>⚫</span> TikTok Pixel ID
+                </label>
+                <input 
+                  type="text" 
+                  value={settings.tiktokPixelId}
+                  onChange={(e) => setSettings({ ...settings, tiktokPixelId: e.target.value.trim() })}
+                  placeholder="مثال: D9INTRJC77U820ARL2J0"
+                  className={styles.settingInput}
+                />
+                <p className={styles.settingHelp}>
+                  الرقم النشط حالياً: <strong>{settings.tiktokPixelId || 'لم يتم الضبط'}</strong>
+                </p>
+              </div>
+
+              {/* Snapchat Pixel */}
+              <div className={styles.settingField}>
+                <label className={styles.settingLabel}>
+                  <span>🟡</span> Snapchat Pixel ID (اختياري)
+                </label>
+                <input 
+                  type="text" 
+                  value={settings.snapPixelId}
+                  onChange={(e) => setSettings({ ...settings, snapPixelId: e.target.value.trim() })}
+                  placeholder="مثال: 12345678-abcd-..."
+                  className={styles.settingInput}
+                />
+              </div>
+
+              <button 
+                type="submit" 
+                disabled={savingSettings}
+                className={styles.saveSettingsBtn}
+              >
+                {savingSettings ? 'جاري الحفظ والربط...' : 'حفظ الإعدادات وتفعيل البيكسل الآن ✓'}
+              </button>
+            </form>
+          </div>
+        )}
+
       </div>
 
-      {/* Order Preview Modal */}
+      {/* Modal: Add New Product */}
+      {isAddProductOpen && (
+        <div className={styles.formModalOverlay}>
+          <div className={styles.formModalContent}>
+            <div className={styles.formModalHeader}>
+              <h2 style={{ fontSize: '18px', fontWeight: 800 }}>إضافة منتج جديد للمتجر</h2>
+              <button 
+                className={styles.closeModalBtn}
+                onClick={() => setIsAddProductOpen(false)}
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateProduct}>
+              <div className={styles.formGrid}>
+                
+                <div className={styles.formGroup}>
+                  <label>اسم المنتج بالعربي *</label>
+                  <input 
+                    type="text" 
+                    required
+                    placeholder="مثال: سويت شيرت رجالي كاجوال"
+                    value={newProduct.nameAr}
+                    onChange={(e) => {
+                      const name = e.target.value;
+                      // Auto generate a slug if not manually set
+                      setNewProduct(prev => ({
+                        ...prev,
+                        nameAr: name,
+                        id: prev.id ? prev.id : `prod-${Date.now().toString().slice(-6)}`
+                      }));
+                    }}
+                  />
+                </div>
+
+                <div className={styles.formGroup}>
+                  <label>معرف الرابط (Slug) *</label>
+                  <input 
+                    type="text" 
+                    required
+                    placeholder="مثال: casual-sweatshirt"
+                    value={newProduct.id}
+                    onChange={(e) => setNewProduct({ ...newProduct, id: e.target.value.toLowerCase().replace(/\s+/g, '-') })}
+                  />
+                </div>
+
+                <div className={styles.formGroup}>
+                  <label>السعر (جنيه) *</label>
+                  <input 
+                    type="number" 
+                    required
+                    value={newProduct.price}
+                    onChange={(e) => setNewProduct({ ...newProduct, price: Number(e.target.value) })}
+                  />
+                </div>
+
+                <div className={styles.formGroup}>
+                  <label>سعر الشحن (جنيه) *</label>
+                  <input 
+                    type="number" 
+                    required
+                    value={newProduct.shipping}
+                    onChange={(e) => setNewProduct({ ...newProduct, shipping: Number(e.target.value) })}
+                  />
+                </div>
+
+                <div className={styles.formGroupFull}>
+                  <label>رابط الصورة الأساسية للمنتج (Image URL) *</label>
+                  <input 
+                    type="text" 
+                    required
+                    placeholder="رابط الصورة (مثال: /images/black-suit.jpg أو رابط مباشر)"
+                    value={newProduct.colorImage}
+                    onChange={(e) => setNewProduct({ ...newProduct, colorImage: e.target.value })}
+                  />
+                </div>
+
+                <div className={styles.formGroup}>
+                  <label>اسم اللون الأساسي</label>
+                  <input 
+                    type="text" 
+                    placeholder="مثال: أسود، كحلي، زيتي"
+                    value={newProduct.colorNameAr}
+                    onChange={(e) => setNewProduct({ ...newProduct, colorNameAr: e.target.value })}
+                  />
+                </div>
+
+                <div className={styles.formGroup}>
+                  <label>كود اللون (Color)</label>
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <input 
+                      type="color" 
+                      value={newProduct.colorHex}
+                      onChange={(e) => setNewProduct({ ...newProduct, colorHex: e.target.value })}
+                      style={{ width: '45px', height: '40px', padding: '0', cursor: 'pointer' }}
+                    />
+                    <input 
+                      type="text" 
+                      value={newProduct.colorHex}
+                      onChange={(e) => setNewProduct({ ...newProduct, colorHex: e.target.value })}
+                    />
+                  </div>
+                </div>
+
+                <div className={styles.formGroupFull}>
+                  <label>مميزات المنتج (سطر لكل ميزة)</label>
+                  <textarea 
+                    rows={3}
+                    value={newProduct.featuresAr}
+                    onChange={(e) => setNewProduct({ ...newProduct, featuresAr: e.target.value })}
+                  />
+                </div>
+
+              </div>
+
+              <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
+                <button 
+                  type="submit" 
+                  className={styles.saveSettingsBtn}
+                  style={{ background: '#115e34' }}
+                >
+                  حفظ ونشر صفحة المنتج الآن ✓
+                </button>
+                <button 
+                  type="button" 
+                  className={styles.secondaryBtn}
+                  onClick={() => setIsAddProductOpen(false)}
+                >
+                  إلغاء
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* View Order Modal */}
       {viewOrder && (
         <div className={styles.modalOverlay} onClick={() => setViewOrder(null)}>
           <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalHeader}>
-              <h3 className={styles.modalTitle}>تفاصيل الطلب</h3>
-              <button className={styles.closeBtn} onClick={() => {
-                setViewOrder(null);
-                setCopied(false);
-              }}>×</button>
+              <h3>تفاصيل الطلب: {viewOrder['رقم الطلب']}</h3>
+              <button className={styles.closeBtn} onClick={() => setViewOrder(null)}>✕</button>
             </div>
             
-            <div className={styles.orderPreviewBox}>
-              {`الاسم: ${viewOrder['اسم العميل']}\nالموبايل: ${viewOrder['رقم الهاتف']}\nالمحافظة: ${viewOrder['المحافظة']}\nالعنوان: ${viewOrder['العنوان التفصيلي']}\nالشحن: ${viewOrder['مصاريف الشحن']}\nالإجمالي: ${viewOrder['الإجمالي الكلي']}\nملاحظات: ${viewOrder['ملاحظات'] || ''}\nالمنتجات:\n${viewOrder['المنتجات']}\n===`}
+            <div className={styles.modalBody}>
+              <div className={styles.orderSummaryText}>
+                {`📦 تفاصيل الطلب (${viewOrder['رقم الطلب']}):
+👤 العميل: ${viewOrder['اسم العميل']}
+📞 الهاتف: ${viewOrder['رقم الهاتف']}
+📍 المحافظة: ${viewOrder['المحافظة']}
+🏠 العنوان: ${viewOrder['العنوان بالتفصيل']}
+🏷️ المنتجات:
+${viewOrder['المنتجات']}
+💵 سعر المنتجات: ${viewOrder['سعر المنتجات']} جنيه
+🚚 الشحن: ${viewOrder['الشحن']} جنيه
+💰 الإجمالي الكلي: ${viewOrder['الإجمالي الكلي']} جنيه
+📝 ملاحظات: ${viewOrder['ملاحظات'] || 'لا يوجد'}
+⏰ التاريخ: ${viewOrder['التاريخ والوقت']}`}
+              </div>
             </div>
 
-            <div className={styles.modalActions}>
+            <div className={styles.modalFooter}>
               <button 
-                className={`${styles.copyBtn} ${copied ? styles.copiedBtn : ''}`} 
+                className={`${styles.copyBtn} ${copied ? styles.copiedBtn : ''}`}
                 onClick={() => {
-                  const text = `الاسم: ${viewOrder['اسم العميل']}\nالموبايل: ${viewOrder['رقم الهاتف']}\nالمحافظة: ${viewOrder['المحافظة']}\nالعنوان: ${viewOrder['العنوان التفصيلي']}\nالشحن: ${viewOrder['مصاريف الشحن']}\nالإجمالي: ${viewOrder['الإجمالي الكلي']}\nملاحظات: ${viewOrder['ملاحظات'] || ''}\nالمنتجات:\n${viewOrder['المنتجات']}\n===`;
-                  navigator.clipboard.writeText(text);
+                  const textToCopy = `📦 تفاصيل الطلب (${viewOrder['رقم الطلب']}):\n👤 العميل: ${viewOrder['اسم العميل']}\n📞 الهاتف: ${viewOrder['رقم الهاتف']}\n📍 المحافظة: ${viewOrder['المحافظة']}\n🏠 العنوان: ${viewOrder['العنوان بالتفصيل']}\n🏷️ المنتجات:\n${viewOrder['المنتجات']}\n💵 سعر المنتجات: ${viewOrder['سعر المنتجات']} جنيه\n🚚 الشحن: ${viewOrder['الشحن']} جنيه\n💰 الإجمالي الكلي: ${viewOrder['الإجمالي الكلي']} جنيه\n📝 ملاحظات: ${viewOrder['ملاحظات'] || 'لا يوجد'}\n⏰ التاريخ: ${viewOrder['التاريخ والوقت']}`;
+                  navigator.clipboard.writeText(textToCopy);
                   setCopied(true);
-                  setTimeout(() => {
-                    setCopied(false);
-                    setViewOrder(null);
-                  }, 2000);
+                  setTimeout(() => setCopied(false), 2000);
                 }}
               >
-                {copied ? '✔️ تم النسخ' : '📋 نسخ الطلب'}
+                {copied ? 'تم النسخ بنجاح! ✓' : '📋 نسخ تفاصيل الطلب بالكامل'}
               </button>
             </div>
           </div>
         </div>
       )}
+
     </div>
   );
 }
-

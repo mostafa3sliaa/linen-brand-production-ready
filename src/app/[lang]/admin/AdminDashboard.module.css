@@ -443,3 +443,357 @@ input:checked + .slider:before {
   background: #e6f4ea;
   color: #0d4626;
 }
+
+/* Navigation Tabs */
+.tabsNav {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  background: white;
+  padding: 8px;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+}
+
+.tabBtn {
+  padding: 10px 20px;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  color: #495057;
+  cursor: pointer;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.tabBtn:hover {
+  background: #f1f3f5;
+  color: #111;
+}
+
+.tabBtnActive {
+  background: #111 !important;
+  color: #fff !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Products Section */
+.productsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.addProductBtn {
+  background: #115e34;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(17, 94, 52, 0.3);
+}
+
+.addProductBtn:hover {
+  background: #0d4626;
+  transform: translateY(-1px);
+}
+
+.productGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.productCard {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e9ecef;
+  display: flex;
+  flex-direction: column;
+}
+
+.productImageWrap {
+  position: relative;
+  width: 100%;
+  height: 220px;
+  background: #f8f9fa;
+}
+
+.productCardBody {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.productCardTitle {
+  font-size: 17px;
+  font-weight: 800;
+  margin-bottom: 6px;
+  color: #212529;
+}
+
+.productCardPrice {
+  font-size: 16px;
+  color: #115e34;
+  font-weight: 800;
+  margin-bottom: 12px;
+}
+
+.productCardBadges {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.colorBadge {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  display: inline-block;
+}
+
+.sizeBadge {
+  background: #f1f3f5;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #495057;
+}
+
+.productCardActions {
+  display: flex;
+  gap: 10px;
+  margin-top: auto;
+  border-top: 1px solid #f1f3f5;
+  padding-top: 12px;
+}
+
+.viewProductLink {
+  flex: 1;
+  text-align: center;
+  background: #111;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.viewProductLink:hover {
+  background: #333;
+}
+
+.deleteProductBtn {
+  background: #fff5f5;
+  color: #e03131;
+  border: 1px solid #ffc9c9;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.deleteProductBtn:hover {
+  background: #ffe3e3;
+}
+
+/* Settings Card */
+.settingsCard {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.settingsTitle {
+  font-size: 20px;
+  font-weight: 800;
+  color: #212529;
+  margin-bottom: 8px;
+}
+
+.settingsSubtitle {
+  font-size: 14px;
+  color: #6c757d;
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+.settingField {
+  margin-bottom: 20px;
+}
+
+.settingLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #343a40;
+  margin-bottom: 8px;
+}
+
+.settingInput {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #ced4da;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  font-family: inherit;
+  direction: ltr;
+  text-align: left;
+  transition: border-color 0.2s;
+}
+
+.settingInput:focus {
+  border-color: #115e34;
+}
+
+.settingHelp {
+  font-size: 12px;
+  color: #868e96;
+  margin-top: 4px;
+}
+
+.saveSettingsBtn {
+  width: 100%;
+  background: #111;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.saveSettingsBtn:hover {
+  background: #2b2b2b;
+}
+
+.successBanner {
+  background: #ebfbee;
+  color: #2b8a3e;
+  border: 1px solid #b2f2bb;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Modal Form for Add Product */
+.formModalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.formModalContent {
+  background: white;
+  width: 100%;
+  max-width: 680px;
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+}
+
+.formModalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #e9ecef;
+  padding-bottom: 12px;
+}
+
+.closeModalBtn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #868e96;
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.formGroupFull {
+  grid-column: span 2;
+}
+
+.formGroup {
+  margin-bottom: 14px;
+}
+
+.formGroup label {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: #495057;
+  margin-bottom: 6px;
+}
+
+.formGroup input,
+.formGroup textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 14px;
+  outline: none;
+}
+
+.formGroup input:focus,
+.formGroup textarea:focus {
+  border-color: #115e34;
+}
+

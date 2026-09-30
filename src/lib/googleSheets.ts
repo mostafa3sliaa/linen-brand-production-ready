@@ -88,3 +88,129 @@ export async function updateOrderStatus(orderId: string, status: string) {
     return false;
   }
 }
+
+// In-memory cache for fast response
+let cachedConfig: { settings: any; products: any[] } | null = null;
+
+export async function getStoreConfig() {
+  if (cachedConfig) {
+    return cachedConfig;
+  }
+
+  const defaultSettings = {
+    fbPixelId: process.env.NEXT_PUBLIC_FB_PIXEL_ID || '1726555298615011',
+    tiktokPixelId: process.env.NEXT_PUBLIC_TIKTOK_PIXEL_ID || 'D9INTRJC77U820ARL2J0',
+    snapPixelId: ''
+  };
+
+  let defaultProducts: any[] = [];
+  try {
+    const productsJson = await import('@/data/products.json');
+    defaultProducts = productsJson.default?.products || (productsJson as any).products || [];
+  } catch (e) {
+    console.error("Error loading default products.json:", e);
+  }
+
+  const auth = getAuthClient();
+  if (!auth) {
+    return { settings: defaultSettings, products: defaultProducts };
+  }
+
+  const sheets = google.sheets({ version: 'v4', auth });
+  const spreadsheetId = '1KWTEpGeVqQgSLVhV606uKJ3MC_cOlP7iOFBzmShqDk0';
+
+  try {
+    const res = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: 'Config!A1:B1',
+    });
+
+    const row = res.data.values?.[0];
+    let settings = defaultSettings;
+    let products = defaultProducts;
+
+    if (row && row[0]) {
+      try {
+        const parsed = JSON.parse(row[0]);
+        if (parsed && typeof parsed === 'object') {
+          settings = { ...defaultSettings, ...parsed };
+        }
+      } catch (err) {
+        console.warn("Could not parse settings from Google Sheets:", err);
+      }
+    }
+
+    if (row && row[1]) {
+      try {
+        const parsed = JSON.parse(row[1]);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          products = parsed;
+        }
+      } catch (err) {
+        console.warn("Could not parse products from Google Sheets:", err);
+      }
+    }
+
+    cachedConfig = { settings, products };
+    return cachedConfig;
+  } catch (error: any) {
+    // If Config sheet does not exist or network error, return defaults
+    console.warn("Could not fetch Config sheet from Google Sheets, using defaults:", error.message || error);
+    return { settings: defaultSettings, products: defaultProducts };
+  }
+}
+
+export async function saveStoreConfig(newConfig: { settings?: any; products?: any[] }) {
+  const current = await getStoreConfig();
+  const updatedSettings = newConfig.settings ? { ...current.settings, ...newConfig.settings } : current.settings;
+  const updatedProducts = newConfig.products ? newConfig.products : current.products;
+
+  cachedConfig = { settings: updatedSettings, products: updatedProducts };
+
+  const auth = getAuthClient();
+  if (!auth) return false;
+
+  const sheets = google.sheets({ version: 'v4', auth });
+  const spreadsheetId = '1KWTEpGeVqQgSLVhV606uKJ3MC_cOlP7iOFBzmShqDk0';
+
+  const values = [[JSON.stringify(updatedSettings), JSON.stringify(updatedProducts)]];
+
+  const updateRange = async () => {
+    return await sheets.spreadsheets.values.update({
+      spreadsheetId,
+      range: 'Config!A1:B1',
+      valueInputOption: 'USER_ENTERED',
+      requestBody: { values },
+    });
+  };
+
+  try {
+    await updateRange();
+    return true;
+  } catch (error: any) {
+    // If Config sheet doesn't exist, create it via batchUpdate
+    try {
+      await sheets.spreadsheets.batchUpdate({
+        spreadsheetId,
+        requestBody: {
+          requests: [
+            {
+              addSheet: {
+                properties: {
+                  title: 'Config',
+                },
+              },
+            },
+          ],
+        },
+      });
+      // Retry update
+      await updateRange();
+      return true;
+    } catch (batchErr) {
+      console.error("Failed to create Config sheet or update:", batchErr);
+      return false;
+    }
+  }
+}
+
