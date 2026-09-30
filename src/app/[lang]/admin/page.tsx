@@ -1,7 +1,6 @@
 "use client";
 import { useState, useEffect, useMemo, useRef } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import styles from './AdminDashboard.module.css';
 
 export default function AdminDashboard() {
@@ -25,6 +24,10 @@ export default function AdminDashboard() {
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // New Product Helpers State
+  const [manualImageUrl, setManualImageUrl] = useState('');
+  const [customSizeInput, setCustomSizeInput] = useState('');
+
   // New Product Form State
   const [newProduct, setNewProduct] = useState({
     id: '',
@@ -33,11 +36,17 @@ export default function AdminDashboard() {
     price: 650,
     shipping: 50,
     featuresAr: 'خامة كتان فاخرة\nمناسب لكل الأوقات\nألوان أنيقة وعصرية',
-    colorNameAr: 'أسود',
-    colorHex: '#000000',
-    colorImage: '/images/black-suit.jpg',
+    images: [] as string[],
+    colors: [
+      { id: 'c-black', labelAr: 'أسود', hex: '#000000' }
+    ],
+    sizes: ['M', 'L', 'XL', '2XL', '3XL', '4XL'],
+    hasSizeChart: true,
     videoUrl: '',
   });
+
+  // Available size presets
+  const sizePresets = ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', '6XL'];
 
   // Settings State
   const [settings, setSettings] = useState({
@@ -155,31 +164,136 @@ export default function AdminDashboard() {
     setSavingSettings(false);
   };
 
+  // Client-side image compression
+  const compressImage = (file: File): Promise<Blob> => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new window.Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const maxDim = 1200;
+          let width = img.width;
+          let height = img.height;
+          if (width > height && width > maxDim) {
+            height = Math.round((height * maxDim) / width);
+            width = maxDim;
+          } else if (height > maxDim) {
+            width = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx?.drawImage(img, 0, 0, width, height);
+          canvas.toBlob((blob) => {
+            resolve(blob || file);
+          }, 'image/jpeg', 0.85);
+        };
+        img.src = e.target?.result as string;
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  // Handle uploading multiple images from device
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
 
     setUploading(true);
     try {
-      const formData = new FormData();
-      formData.append('file', file);
+      const newUrls: string[] = [];
+      for (const file of Array.from(files)) {
+        const compressedBlob = await compressImage(file);
+        const formData = new FormData();
+        formData.append('file', compressedBlob, file.name);
 
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
-      });
-      const data = await res.json();
-      if (data?.url) {
-        setNewProduct(prev => ({ ...prev, colorImage: data.url }));
-      } else {
-        alert("فشل رفع الصورة: " + (data?.error || "خطأ غير معروف"));
+        const res = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData,
+        });
+        const data = await res.json();
+        if (data?.url) {
+          newUrls.push(data.url);
+        }
+      }
+
+      if (newUrls.length > 0) {
+        setNewProduct(prev => ({
+          ...prev,
+          images: [...prev.images, ...newUrls]
+        }));
       }
     } catch (err) {
       console.error("Upload error:", err);
-      alert("حدث خطأ أثناء رفع الصورة");
+      alert("حدث خطأ أثناء رفع الصور");
     } finally {
       setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
     }
+  };
+
+  const addManualImage = () => {
+    if (!manualImageUrl.trim()) return;
+    setNewProduct(prev => ({
+      ...prev,
+      images: [...prev.images, manualImageUrl.trim()]
+    }));
+    setManualImageUrl('');
+  };
+
+  const removeImage = (index: number) => {
+    setNewProduct(prev => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== index)
+    }));
+  };
+
+  // Colors management
+  const addColor = () => {
+    setNewProduct(prev => ({
+      ...prev,
+      colors: [...prev.colors, { id: `c-${Date.now()}`, labelAr: 'لون جديد', hex: '#666666' }]
+    }));
+  };
+
+  const updateColor = (index: number, key: 'labelAr' | 'hex', value: string) => {
+    setNewProduct(prev => {
+      const updated = [...prev.colors];
+      updated[index] = { ...updated[index], [key]: value };
+      return { ...prev, colors: updated };
+    });
+  };
+
+  const removeColor = (index: number) => {
+    if (newProduct.colors.length <= 1) {
+      alert("يجب أن يحتوي المنتج على لون واحد على الأقل");
+      return;
+    }
+    setNewProduct(prev => ({
+      ...prev,
+      colors: prev.colors.filter((_, i) => i !== index)
+    }));
+  };
+
+  // Sizes management
+  const toggleSize = (size: string) => {
+    setNewProduct(prev => {
+      const exists = prev.sizes.includes(size);
+      const updated = exists ? prev.sizes.filter(s => s !== size) : [...prev.sizes, size];
+      return { ...prev, sizes: updated };
+    });
+  };
+
+  const addCustomSize = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!customSizeInput.trim()) return;
+    const val = customSizeInput.trim().toUpperCase();
+    if (!newProduct.sizes.includes(val)) {
+      setNewProduct(prev => ({ ...prev, sizes: [...prev.sizes, val] }));
+    }
+    setCustomSizeInput('');
   };
 
   const handleCreateProduct = async (e: React.FormEvent) => {
@@ -189,11 +303,23 @@ export default function AdminDashboard() {
       return;
     }
 
-    const slug = newProduct.id.trim() || `prod-${Date.now()}`;
+    if (newProduct.images.length === 0) {
+      alert("يرجى إضافة صورة واحدة على الأقل للمنتج (عبر الرفع أو الرابط)");
+      return;
+    }
+
+    const slug = newProduct.id.trim() || `prod-${Date.now().toString().slice(-6)}`;
     const featuresList = newProduct.featuresAr
       .split('\n')
       .map(f => f.trim())
       .filter(Boolean);
+
+    const finalColors = newProduct.colors.map((c, i) => ({
+      id: c.id || `color-${i}`,
+      label: { ar: c.labelAr, en: c.labelAr },
+      hex: c.hex,
+      images: newProduct.images
+    }));
 
     const productPayload = {
       id: slug,
@@ -204,27 +330,21 @@ export default function AdminDashboard() {
       price: Number(newProduct.price) || 650,
       shipping: Number(newProduct.shipping) || 50,
       videoUrl: newProduct.videoUrl.trim() || undefined,
+      hasSizeChart: newProduct.hasSizeChart,
       features: {
         ar: featuresList.length > 0 ? featuresList : ['خامة عالية الجودة', 'تصميم عصري'],
         en: ['Premium Quality', 'Modern Design']
       },
-      colors: [
-        {
-          id: 'primary',
-          label: { ar: newProduct.colorNameAr || 'أساسي', en: 'Primary' },
-          hex: newProduct.colorHex || '#000000',
-          images: [newProduct.colorImage || '/images/black-suit.jpg'],
-        }
-      ],
-      sizes: ['M', 'L', 'XL', '2XL', '3XL', '4XL'],
-      sizeChart: {
+      colors: finalColors,
+      sizes: newProduct.sizes.length > 0 ? newProduct.sizes : ['M', 'L', 'XL', '2XL'],
+      sizeChart: newProduct.hasSizeChart ? {
         "M": { shirtWidth: 52, shirtLength: 68, pantsLength: 98, weight: "من 50 كيلو إلى 60 كيلو" },
         "L": { shirtWidth: 54, shirtLength: 70, pantsLength: 99, weight: "من 60 كيلو إلى 70 كيلو" },
         "XL": { shirtWidth: 56, shirtLength: 70, pantsLength: 100, weight: "من 70 كيلو إلى 80 كيلو" },
         "2XL": { shirtWidth: 58, shirtLength: 72, pantsLength: 100, weight: "من 80 كيلو إلى 90 كيلو" },
         "3XL": { shirtWidth: 60, shirtLength: 72, pantsLength: 102, weight: "من 90 كيلو إلى 100 كيلو" },
         "4XL": { shirtWidth: 62, shirtLength: 75, pantsLength: 102, weight: "من 100 كيلو إلى 110 كيلو" },
-      }
+      } : undefined
     };
 
     try {
@@ -247,9 +367,12 @@ export default function AdminDashboard() {
           price: 650,
           shipping: 50,
           featuresAr: 'خامة كتان فاخرة\nمناسب لكل الأوقات\nألوان أنيقة وعصرية',
-          colorNameAr: 'أسود',
-          colorHex: '#000000',
-          colorImage: '/images/black-suit.jpg',
+          images: [],
+          colors: [
+            { id: 'c-black', labelAr: 'أسود', hex: '#000000' }
+          ],
+          sizes: ['M', 'L', 'XL', '2XL', '3XL', '4XL'],
+          hasSizeChart: true,
           videoUrl: '',
         });
       } else {
@@ -521,16 +644,14 @@ export default function AdminDashboard() {
                   return (
                     <div key={p.id || idx} className={styles.productCard}>
                       <div className={styles.productImageWrap}>
-                        <Image 
+                        <img 
                           src={mainImg} 
-                          alt={p.name.ar} 
-                          fill 
-                          sizes="300px" 
-                          style={{ objectFit: 'cover' }} 
+                          alt={p.name?.ar || ''} 
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
                         />
                       </div>
                       <div className={styles.productCardBody}>
-                        <h3 className={styles.productCardTitle}>{p.name.ar}</h3>
+                        <h3 className={styles.productCardTitle}>{p.name?.ar}</h3>
                         <div className={styles.productCardPrice}>{p.price} جنيه (+ {p.shipping || 50} شحن)</div>
                         
                         <div className={styles.productCardBadges}>
@@ -557,7 +678,7 @@ export default function AdminDashboard() {
                           </Link>
                           {products.length > 1 && (
                             <button 
-                              onClick={() => handleDeleteProduct(p.id, p.name.ar)}
+                              onClick={() => handleDeleteProduct(p.id, p.name?.ar)}
                               className={styles.deleteProductBtn}
                               title="حذف المنتج"
                             >
@@ -670,16 +791,16 @@ export default function AdminDashboard() {
             <form onSubmit={handleCreateProduct}>
               <div className={styles.formGrid}>
                 
+                {/* 1. Basic Info */}
                 <div className={styles.formGroup}>
                   <label>اسم المنتج بالعربي *</label>
                   <input 
                     type="text" 
                     required
-                    placeholder="مثال: سويت شيرت رجالي كاجوال"
+                    placeholder="مثال: طقم كتان كلاسيك"
                     value={newProduct.nameAr}
                     onChange={(e) => {
                       const name = e.target.value;
-                      // Auto generate a slug if not manually set
                       setNewProduct(prev => ({
                         ...prev,
                         nameAr: name,
@@ -694,12 +815,12 @@ export default function AdminDashboard() {
                   <input 
                     type="text" 
                     required
-                    placeholder="مثال: casual-sweatshirt"
+                    placeholder="مثال: classic-suit"
                     value={newProduct.id}
                     onChange={(e) => setNewProduct({ ...newProduct, id: e.target.value.toLowerCase().replace(/\s+/g, '-') })}
                   />
                   <p style={{ fontSize: '11px', color: '#6c757d', marginTop: '4px' }}>
-                    💡 هو الكلمة بالإنجليزية في رابط المنتج، مثال: casual-suit. يُكتب تلقائياً، ويمكنك تركه كما هو!
+                    💡 هو الكلمة بالإنجليزية في رابط المنتج. يُكتب تلقائياً، ويمكنك تركه كما هو!
                   </p>
                 </div>
 
@@ -723,8 +844,9 @@ export default function AdminDashboard() {
                   />
                 </div>
 
+                {/* 2. Multiple Images Upload */}
                 <div className={styles.formGroupFull}>
-                  <label>صورة المنتج الأساسية *</label>
+                  <label style={{ fontSize: '14px', fontWeight: 800 }}>صور المنتج (يمكنك رفع أكثر من صورة) *</label>
                   
                   {/* File upload from device */}
                   <div 
@@ -735,43 +857,164 @@ export default function AdminDashboard() {
                       type="file" 
                       ref={fileInputRef} 
                       accept="image/*" 
+                      multiple
                       style={{ display: 'none' }} 
                       onChange={handleImageUpload}
                     />
                     {uploading ? (
-                      <div className={styles.uploadLoading}>⏳ جاري رفع الصورة من جهازك، ثواني...</div>
+                      <div className={styles.uploadLoading}>⏳ جاري رفع وضغط الصور من جهازك، ثواني...</div>
                     ) : (
                       <>
-                        <div style={{ fontSize: '26px' }}>📷</div>
+                        <div style={{ fontSize: '28px' }}>📷</div>
                         <div style={{ fontWeight: 700, fontSize: '14px', color: '#115e34' }}>
-                          اضغط هنا لاختيار صورة من جهازك (كمبيوتر أو موبايل)
+                          اضغط هنا لرفع صور من جهازك (كمبيوتر أو موبايل)
                         </div>
                         <div style={{ fontSize: '12px', color: '#6c757d' }}>
-                          يدعم كل أنواع الصور (JPG, PNG, WebP)
+                          يمكنك اختيار أكثر من صورة معاً (JPG, PNG, WebP)
                         </div>
                       </>
                     )}
-                    {newProduct.colorImage && (
-                      <img 
-                        src={newProduct.colorImage} 
-                        alt="معاينة الصورة" 
-                        className={styles.uploadPreview} 
-                      />
-                    )}
                   </div>
 
-                  <label style={{ fontSize: '12px', color: '#6c757d', marginTop: '6px', display: 'block' }}>
-                    أو الصق رابط الصورة المباشر:
-                  </label>
-                  <input 
-                    type="text" 
-                    required
-                    placeholder="رابط الصورة (مثال: /images/black-suit.jpg أو رابط مباشر)"
-                    value={newProduct.colorImage}
-                    onChange={(e) => setNewProduct({ ...newProduct, colorImage: e.target.value })}
-                  />
+                  {/* Uploaded Images Gallery */}
+                  {newProduct.images.length > 0 && (
+                    <div style={{ marginTop: '10px' }}>
+                      <span style={{ fontSize: '12px', fontWeight: 700, color: '#495057' }}>
+                        الصور المرفوعة للمنتج ({newProduct.images.length}):
+                      </span>
+                      <div className={styles.imagesList}>
+                        {newProduct.images.map((imgUrl, imgIdx) => (
+                          <div key={imgIdx} className={styles.imageItemThumb}>
+                            <img src={imgUrl} alt="صورة المنتج" />
+                            <button 
+                              type="button"
+                              className={styles.removeImageBtn}
+                              onClick={() => removeImage(imgIdx)}
+                              title="حذف الصورة"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Manual URL option */}
+                  <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+                    <input 
+                      type="text" 
+                      placeholder="أو أضف رابط صورة مباشر واضغط إضافة..."
+                      value={manualImageUrl}
+                      onChange={(e) => setManualImageUrl(e.target.value)}
+                    />
+                    <button 
+                      type="button" 
+                      className={styles.secondaryBtn} 
+                      onClick={addManualImage}
+                      style={{ whiteSpace: 'nowrap' }}
+                    >
+                      + إضافة
+                    </button>
+                  </div>
                 </div>
 
+                {/* 3. Colors List */}
+                <div className={styles.formGroupFull}>
+                  <label style={{ fontSize: '14px', fontWeight: 800 }}>ألوان المنتج</label>
+                  <div className={styles.colorsContainer}>
+                    {newProduct.colors.map((color, colorIdx) => (
+                      <div key={color.id || colorIdx} className={styles.colorRow}>
+                        <input 
+                          type="color" 
+                          value={color.hex}
+                          onChange={(e) => updateColor(colorIdx, 'hex', e.target.value)}
+                          style={{ width: '40px', height: '36px', padding: '0', cursor: 'pointer', border: 'none', background: 'transparent' }}
+                        />
+                        <input 
+                          type="text" 
+                          placeholder="اسم اللون (مثال: أسود، بيج، أبيض)"
+                          value={color.labelAr}
+                          onChange={(e) => updateColor(colorIdx, 'labelAr', e.target.value)}
+                        />
+                        {newProduct.colors.length > 1 && (
+                          <button 
+                            type="button" 
+                            className={styles.removeColorBtn}
+                            onClick={() => removeColor(colorIdx)}
+                          >
+                            حذف اللون
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                    <button 
+                      type="button" 
+                      className={styles.addColorBtn}
+                      onClick={addColor}
+                    >
+                      + إضافة لون آخر للمنتج
+                    </button>
+                  </div>
+                </div>
+
+                {/* 4. Sizes Selection */}
+                <div className={styles.formGroupFull}>
+                  <label style={{ fontSize: '14px', fontWeight: 800 }}>المقاسات المتوفرة (اضغط لتحديد المقاس)</label>
+                  <div className={styles.sizeChips}>
+                    {sizePresets.map((s) => {
+                      const isSelected = newProduct.sizes.includes(s);
+                      return (
+                        <button
+                          key={s}
+                          type="button"
+                          className={`${styles.sizeChip} ${isSelected ? styles.sizeChipActive : ''}`}
+                          onClick={() => toggleSize(s)}
+                        >
+                          {isSelected ? `✓ ${s}` : s}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {/* Custom size input */}
+                  <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
+                    <input 
+                      type="text" 
+                      placeholder="أو اكتب مقاس مخصص (مثال: Free Size أو 38)..."
+                      value={customSizeInput}
+                      onChange={(e) => setCustomSizeInput(e.target.value)}
+                    />
+                    <button 
+                      type="button" 
+                      className={styles.secondaryBtn}
+                      onClick={addCustomSize}
+                      style={{ whiteSpace: 'nowrap' }}
+                    >
+                      + إضافة مقاس
+                    </button>
+                  </div>
+                </div>
+
+                {/* 5. Size Chart Toggle */}
+                <div className={styles.formGroupFull}>
+                  <label className={styles.toggleBox}>
+                    <input 
+                      type="checkbox" 
+                      checked={newProduct.hasSizeChart}
+                      onChange={(e) => setNewProduct({ ...newProduct, hasSizeChart: e.target.checked })}
+                    />
+                    <div>
+                      <strong style={{ display: 'block', fontSize: '14px' }}>تفعيل جدول المقاسات والأوزان لهذا المنتج</strong>
+                      <span style={{ fontSize: '12px', color: '#6c757d' }}>
+                        {newProduct.hasSizeChart 
+                          ? '✓ مفعّل: سيظهر زر جدول المقاسات وصندوق الوزن المناسب تلقائياً في صفحة المنتج.' 
+                          : '✕ معطّل: لن يظهر زر جدول المقاسات (مناسب للمنتجات التي لا تحتاج جدول مقاسات كالساعات أو الإكسسوارات).'}
+                      </span>
+                    </div>
+                  </label>
+                </div>
+
+                {/* 6. Video Support */}
                 <div className={styles.formGroupFull}>
                   <label>🎥 رابط فيديو للمنتج (اختياري - YouTube أو Reel أو فيديو مباشر)</label>
                   <input 
@@ -785,33 +1028,7 @@ export default function AdminDashboard() {
                   </p>
                 </div>
 
-                <div className={styles.formGroup}>
-                  <label>اسم اللون الأساسي</label>
-                  <input 
-                    type="text" 
-                    placeholder="مثال: أسود، كحلي، زيتي"
-                    value={newProduct.colorNameAr}
-                    onChange={(e) => setNewProduct({ ...newProduct, colorNameAr: e.target.value })}
-                  />
-                </div>
-
-                <div className={styles.formGroup}>
-                  <label>كود اللون (Color)</label>
-                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                    <input 
-                      type="color" 
-                      value={newProduct.colorHex}
-                      onChange={(e) => setNewProduct({ ...newProduct, colorHex: e.target.value })}
-                      style={{ width: '45px', height: '40px', padding: '0', cursor: 'pointer' }}
-                    />
-                    <input 
-                      type="text" 
-                      value={newProduct.colorHex}
-                      onChange={(e) => setNewProduct({ ...newProduct, colorHex: e.target.value })}
-                    />
-                  </div>
-                </div>
-
+                {/* 7. Features */}
                 <div className={styles.formGroupFull}>
                   <label>مميزات المنتج (سطر لكل ميزة)</label>
                   <textarea 
@@ -823,7 +1040,7 @@ export default function AdminDashboard() {
 
               </div>
 
-              <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
+              <div style={{ display: 'flex', gap: '10px', marginTop: '24px' }}>
                 <button 
                   type="submit" 
                   className={styles.saveSettingsBtn}

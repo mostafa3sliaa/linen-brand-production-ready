@@ -123,15 +123,25 @@ export default function ImageGallery({ colors, activeColorId, onColorChange, isA
             onClick={() => { if(!isFullscreen && window.innerWidth >= 768) setIsFullscreen(true); }}
           >
             <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-              <Image 
-                src={imageSrc} 
-                alt={isAr ? color.label.ar : color.label.en}
-                fill
-                sizes="(max-width: 768px) 100vw, 50vw"
-                className={`${styles.mainImage} ${isZooming && safeActiveIndex === idx ? styles.zoomed : ''}`}
-                style={{ objectFit: 'cover', ...(isZooming && safeActiveIndex === idx ? zoomStyle : {}) }}
-                priority={idx === 0}
-              />
+              {imageSrc?.startsWith('data:') || imageSrc?.startsWith('blob:') ? (
+                <img 
+                  src={imageSrc} 
+                  alt={isAr ? color.label?.ar || '' : color.label?.en || ''}
+                  className={`${styles.mainImage} ${isZooming && safeActiveIndex === idx ? styles.zoomed : ''}`}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', ...(isZooming && safeActiveIndex === idx ? zoomStyle : {}) }}
+                />
+              ) : (
+                <Image 
+                  src={imageSrc || '/images/black-suit.jpg'} 
+                  alt={isAr ? color.label?.ar || '' : color.label?.en || ''}
+                  fill
+                  unoptimized
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  className={`${styles.mainImage} ${isZooming && safeActiveIndex === idx ? styles.zoomed : ''}`}
+                  style={{ objectFit: 'cover', ...(isZooming && safeActiveIndex === idx ? zoomStyle : {}) }}
+                  priority={idx === 0}
+                />
+              )}
             </div>
           </div>
         )})}
@@ -141,7 +151,7 @@ export default function ImageGallery({ colors, activeColorId, onColorChange, isA
       <div className={styles.pagination}>
         {colors.map((color, idx) => (
           <div 
-            key={color.id} 
+            key={color.id || idx} 
             className={`${styles.dot} ${safeActiveIndex === idx ? styles.activeDot : ''}`}
             onClick={() => onColorChange(color)}
           />
@@ -155,12 +165,16 @@ export default function ImageGallery({ colors, activeColorId, onColorChange, isA
             const imageSrc = gender === 'women' && color.femaleImages ? color.femaleImages[0] : color.images[0];
             return (
             <button 
-              key={color.id}
+              key={color.id || idx}
               onClick={() => onColorChange(color)}
               className={`${styles.thumbnailBtn} ${safeActiveIndex === idx ? styles.activeThumb : ''}`}
-              aria-label={isAr ? color.label.ar : color.label.en}
+              aria-label={isAr ? color.label?.ar || '' : color.label?.en || ''}
             >
-              <Image src={imageSrc} alt="" fill sizes="80px" style={{ objectFit: 'cover' }} />
+              {imageSrc?.startsWith('data:') || imageSrc?.startsWith('blob:') ? (
+                <img src={imageSrc} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ) : (
+                <Image src={imageSrc || '/images/black-suit.jpg'} alt="" fill unoptimized sizes="80px" style={{ objectFit: 'cover' }} />
+              )}
             </button>
             );
           })}

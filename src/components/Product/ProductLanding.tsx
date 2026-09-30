@@ -297,9 +297,11 @@ export default function ProductLanding({ lang, initialProduct }: { lang: string;
           <div className={styles.section}>
             <div className={styles.sizeHeader}>
               <h3 className={styles.sectionTitle}>{isAr ? 'المقاس' : 'Size'}: <span>{activeSize}</span></h3>
-              <button className={styles.sizeGuideBtn} onClick={() => setIsSizeGuideOpen(true)}>
-                📏 {isAr ? 'جدول المقاسات' : 'Size Chart'}
-              </button>
+              {PRODUCT?.sizeChart && PRODUCT?.hasSizeChart !== false && (
+                <button className={styles.sizeGuideBtn} onClick={() => setIsSizeGuideOpen(true)}>
+                  📏 {isAr ? 'جدول المقاسات' : 'Size Chart'}
+                </button>
+              )}
             </div>
             <div className={styles.sizeOptions}>
               {PRODUCT?.sizes?.map((size: any) => (
@@ -314,7 +316,7 @@ export default function ProductLanding({ lang, initialProduct }: { lang: string;
             </div>
 
             {/* Dynamic Size Info */}
-            {PRODUCT?.sizeChart?.[activeSize] && (
+            {PRODUCT?.hasSizeChart !== false && PRODUCT?.sizeChart?.[activeSize] && (
               <div className={styles.dynamicSizeInfo}>
                 <div className={styles.sizeInfoWeight}>
                   <span>{isAr ? 'الوزن المناسب:' : 'Ideal Weight:'}</span>
