@@ -246,6 +246,32 @@ export default function ProductLanding({ lang, initialProduct }: { lang: string;
 
           <p className={styles.price}>{PRODUCT.price} {isAr ? 'جنيه' : 'EGP'}</p>
           
+          {PRODUCT?.videoUrl && (
+            <div style={{ margin: '10px 0 16px' }}>
+              <a
+                href={PRODUCT.videoUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  background: 'linear-gradient(135deg, #111, #333)',
+                  color: '#fff',
+                  padding: '8px 16px',
+                  borderRadius: '20px',
+                  fontSize: '13px',
+                  fontWeight: 700,
+                  textDecoration: 'none',
+                  border: '1px solid #444',
+                  boxShadow: '0 4px 10px rgba(0,0,0,0.1)'
+                }}
+              >
+                <span>▶️</span> {isAr ? 'مشاهدة فيديو للمنتج' : 'Watch Product Video'}
+              </a>
+            </div>
+          )}
+
           {/* Bullet points under price */}
           <ul className={styles.featuresList}>
             {(isAr ? PRODUCT?.features?.ar : PRODUCT?.features?.en)?.map((feature: any, idx: number) => (

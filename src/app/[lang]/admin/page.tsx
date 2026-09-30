@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import styles from './AdminDashboard.module.css';
@@ -22,6 +22,8 @@ export default function AdminDashboard() {
   const [loadingProducts, setLoadingProducts] = useState(false);
   const [isAddProductOpen, setIsAddProductOpen] = useState(false);
   const [productSuccessMsg, setProductSuccessMsg] = useState('');
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // New Product Form State
   const [newProduct, setNewProduct] = useState({
@@ -34,6 +36,7 @@ export default function AdminDashboard() {
     colorNameAr: 'أسود',
     colorHex: '#000000',
     colorImage: '/images/black-suit.jpg',
+    videoUrl: '',
   });
 
   // Settings State
@@ -152,6 +155,33 @@ export default function AdminDashboard() {
     setSavingSettings(false);
   };
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await res.json();
+      if (data?.url) {
+        setNewProduct(prev => ({ ...prev, colorImage: data.url }));
+      } else {
+        alert("فشل رفع الصورة: " + (data?.error || "خطأ غير معروف"));
+      }
+    } catch (err) {
+      console.error("Upload error:", err);
+      alert("حدث خطأ أثناء رفع الصورة");
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleCreateProduct = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newProduct.nameAr) {
@@ -173,6 +203,7 @@ export default function AdminDashboard() {
       },
       price: Number(newProduct.price) || 650,
       shipping: Number(newProduct.shipping) || 50,
+      videoUrl: newProduct.videoUrl.trim() || undefined,
       features: {
         ar: featuresList.length > 0 ? featuresList : ['خامة عالية الجودة', 'تصميم عصري'],
         en: ['Premium Quality', 'Modern Design']
@@ -219,6 +250,7 @@ export default function AdminDashboard() {
           colorNameAr: 'أسود',
           colorHex: '#000000',
           colorImage: '/images/black-suit.jpg',
+          videoUrl: '',
         });
       } else {
         alert("فشل في إضافة المنتج: " + (data.error || "خطأ غير معروف"));
@@ -666,6 +698,9 @@ export default function AdminDashboard() {
                     value={newProduct.id}
                     onChange={(e) => setNewProduct({ ...newProduct, id: e.target.value.toLowerCase().replace(/\s+/g, '-') })}
                   />
+                  <p style={{ fontSize: '11px', color: '#6c757d', marginTop: '4px' }}>
+                    💡 هو الكلمة بالإنجليزية في رابط المنتج، مثال: casual-suit. يُكتب تلقائياً، ويمكنك تركه كما هو!
+                  </p>
                 </div>
 
                 <div className={styles.formGroup}>
@@ -689,7 +724,45 @@ export default function AdminDashboard() {
                 </div>
 
                 <div className={styles.formGroupFull}>
-                  <label>رابط الصورة الأساسية للمنتج (Image URL) *</label>
+                  <label>صورة المنتج الأساسية *</label>
+                  
+                  {/* File upload from device */}
+                  <div 
+                    className={styles.uploadDropzone}
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    <input 
+                      type="file" 
+                      ref={fileInputRef} 
+                      accept="image/*" 
+                      style={{ display: 'none' }} 
+                      onChange={handleImageUpload}
+                    />
+                    {uploading ? (
+                      <div className={styles.uploadLoading}>⏳ جاري رفع الصورة من جهازك، ثواني...</div>
+                    ) : (
+                      <>
+                        <div style={{ fontSize: '26px' }}>📷</div>
+                        <div style={{ fontWeight: 700, fontSize: '14px', color: '#115e34' }}>
+                          اضغط هنا لاختيار صورة من جهازك (كمبيوتر أو موبايل)
+                        </div>
+                        <div style={{ fontSize: '12px', color: '#6c757d' }}>
+                          يدعم كل أنواع الصور (JPG, PNG, WebP)
+                        </div>
+                      </>
+                    )}
+                    {newProduct.colorImage && (
+                      <img 
+                        src={newProduct.colorImage} 
+                        alt="معاينة الصورة" 
+                        className={styles.uploadPreview} 
+                      />
+                    )}
+                  </div>
+
+                  <label style={{ fontSize: '12px', color: '#6c757d', marginTop: '6px', display: 'block' }}>
+                    أو الصق رابط الصورة المباشر:
+                  </label>
                   <input 
                     type="text" 
                     required
@@ -697,6 +770,19 @@ export default function AdminDashboard() {
                     value={newProduct.colorImage}
                     onChange={(e) => setNewProduct({ ...newProduct, colorImage: e.target.value })}
                   />
+                </div>
+
+                <div className={styles.formGroupFull}>
+                  <label>🎥 رابط فيديو للمنتج (اختياري - YouTube أو Reel أو فيديو مباشر)</label>
+                  <input 
+                    type="text" 
+                    placeholder="مثال: https://www.youtube.com/watch?v=... أو رابط فيديو مباشر"
+                    value={newProduct.videoUrl}
+                    onChange={(e) => setNewProduct({ ...newProduct, videoUrl: e.target.value })}
+                  />
+                  <p style={{ fontSize: '11px', color: '#6c757d', marginTop: '4px' }}>
+                    إذا كان لديك فيديو للمنتج على يوتيوب أو تيك توك، ضع الرابط هنا وسيظهر للعملاء في صفحة المنتج!
+                  </p>
                 </div>
 
                 <div className={styles.formGroup}>
