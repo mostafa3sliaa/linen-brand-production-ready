@@ -5,7 +5,7 @@ import { appendOrderToSheet, getOrdersFromSheet } from '@/lib/googleSheets';
 import { sendTelegramNotification } from '@/lib/telegram';
 import { sendWhatsAppNotification } from '@/lib/whatsapp';
 import { saveToQueue } from '@/lib/queue';
-import { orderSchema } from '@/lib/validations';
+import { orderSchema, normalizeEgyptianPhone } from '@/lib/validations';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -13,7 +13,7 @@ export const revalidate = 0;
 // Simple in-memory rate limiting (IP-based)
 const rateLimitMap = new Map<string, { count: number, timestamp: number }>();
 const WINDOW_MS = 60 * 1000; 
-const MAX_REQUESTS = 5; 
+const MAX_REQUESTS = 30; 
 
 function isRateLimited(ip: string): boolean {
   const now = Date.now();
@@ -43,25 +43,51 @@ export async function POST(req: Request) {
   try {
     const ip = req.headers.get('x-forwarded-for') || 'unknown';
     if (isRateLimited(ip)) {
-      return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+      return NextResponse.json({ error: "تم إرسال عدة طلبات في وقت قصير، يرجى الانتظار دقيقة والمحاولة مجدداً." }, { status: 429 });
     }
 
     const data = await req.json();
     
+    // Clean and normalize incoming data before validation
+    if (data.phone) {
+      data.phone = normalizeEgyptianPhone(String(data.phone));
+    }
+    if (data.customerName) {
+      data.customerName = String(data.customerName).trim();
+    }
+    if (data.address) {
+      data.address = String(data.address).trim();
+    }
+    if (data.governorate) {
+      data.governorate = String(data.governorate).trim();
+    }
+    if (Array.isArray(data.items)) {
+      data.items = data.items.map((it: any) => ({
+        productName: typeof it.productName === 'string' ? it.productName.trim() : (it.productName?.ar || it.productName?.en || 'منتج'),
+        color: typeof it.color === 'string' ? it.color.trim() : (it.color?.ar || it.color?.en || 'افتراضي'),
+        size: typeof it.size === 'string' ? it.size.trim() : 'Free Size',
+        quantity: Number(it.quantity) || 1,
+        price: Number(it.price) || 0
+      }));
+    }
+
     // Server-Side Validation
     try {
       orderSchema.parse(data);
     } catch (err: any) {
-      return NextResponse.json({ error: err.errors?.[0]?.message || "Invalid data" }, { status: 400 });
+      return NextResponse.json({ error: err.errors?.[0]?.message || "بيانات الطلب غير مكتملة، يرجى التأكد من ملء الحقول المطلوبة." }, { status: 400 });
     }
     
     const orderId = `ORD-${Date.now()}`;
     const date = new Date().toLocaleDateString('en-GB');
     const time = new Date().toLocaleTimeString('en-GB');
     
-    const itemsString = data.items.map((item: any) => 
-      `${item.productName.replace('طقم كتان بريميوم', 'كتان')} ${item.color} ${item.size} - الكمية ${item.quantity} - السعر ${item.price}`
-    ).join('\n');
+    const itemsString = data.items.map((item: any) => {
+      const pName = String(item.productName || 'منتج').replace('طقم كتان بريميوم', 'كتان');
+      const pColor = item.color ? ` - لون ${item.color}` : '';
+      const pSize = item.size ? ` - مقاس ${item.size}` : '';
+      return `${pName}${pColor}${pSize} (الكمية: ${item.quantity || 1}, السعر: ${item.price} ج)`;
+    }).join('\n');
 
     const productsTotal = data.items.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0);
     const shippingFee = typeof data.shippingFee === 'number' 

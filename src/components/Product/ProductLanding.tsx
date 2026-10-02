@@ -6,8 +6,19 @@ import MiniCartDrawer from './MiniCartDrawer';
 import StickyBottomCart from './StickyBottomCart';
 import styles from './ProductLanding.module.css';
 
+import { normalizeEgyptianPhone } from '@/lib/validations';
+
 // Import JSON data
 import productsData from '@/data/products.json';
+
+function getSafeText(val: any, isAr: boolean, fallback = ''): string {
+  if (!val) return fallback;
+  if (typeof val === 'string') return val;
+  if (typeof val === 'object') {
+    return (isAr ? (val.ar || val.en) : (val.en || val.ar)) || fallback;
+  }
+  return String(val);
+}
 
 declare global {
   interface Window {
@@ -18,12 +29,14 @@ declare global {
 
 type CartItem = {
   id: string;
+  productName?: string;
   colorId: string;
   colorLabel: string;
   colorImage: string;
   size: string;
   quantity: number;
   price: number;
+  gender?: string;
 };
 
 export default function ProductLanding({ lang, initialProduct }: { lang: string; initialProduct?: any }) {
@@ -99,14 +112,16 @@ export default function ProductLanding({ lang, initialProduct }: { lang: string;
     if (existingItem) {
       updateQuantity(existingItem.id, existingItem.quantity + 1);
     } else {
-      const itemImage = gender === 'women' && color.femaleImages ? color.femaleImages[0] : color.images[0];
+      const itemImage = gender === 'women' && color.femaleImages ? color.femaleImages[0] : (color.images?.[0] || '/images/black-suit.jpg');
+      const itemProductName = getSafeText(PRODUCT?.name, isAr, 'منتج');
+      const itemColorLabel = getSafeText(color?.label, isAr, 'افتراضي');
       const newItem = {
         id: `${color.id}-${size}-${gender}`,
-        productName: isAr ? PRODUCT.name.ar : PRODUCT.name.en,
+        productName: itemProductName,
         colorId: color.id,
-        colorLabel: isAr ? color.label.ar : color.label.en,
-        size,
-        price: PRODUCT.price,
+        colorLabel: itemColorLabel,
+        size: size || 'Free Size',
+        price: Number(PRODUCT?.price) || 0,
         quantity: 1,
         colorImage: itemImage,
         gender: gender
@@ -156,26 +171,40 @@ export default function ProductLanding({ lang, initialProduct }: { lang: string;
   const handleOrder = (e: React.FormEvent) => {
     e.preventDefault();
     if (cart.length === 0) return;
+    const cleanPhone = normalizeEgyptianPhone(formData.phone);
+    if (!cleanPhone || cleanPhone.length < 10) {
+      alert(isAr ? 'يرجى إدخال رقم موبايل صحيح (مثال: 01012345678)' : 'Please enter a valid Egyptian mobile number');
+      return;
+    }
+    if (formData.name.trim().length < 2) {
+      alert(isAr ? 'يرجى إدخال الاسم بالكامل' : 'Please enter your full name');
+      return;
+    }
+    if (formData.address.trim().length < 3) {
+      alert(isAr ? 'يرجى إدخال العنوان بالتفصيل' : 'Please enter your detailed address');
+      return;
+    }
     setReviewMode(true); // Open the review popup instead of submitting immediately
   };
 
   const submitFinalOrder = async () => {
     setIsSubmitting(true);
     try {
+      const cleanPhone = normalizeEgyptianPhone(formData.phone);
       const payload = {
-        customerName: formData.name,
-        phone: formData.phone,
-        governorate: formData.governorate,
-        address: formData.address,
-        notes: formData.notes,
+        customerName: formData.name.trim(),
+        phone: cleanPhone || formData.phone.trim(),
+        governorate: formData.governorate.trim(),
+        address: formData.address.trim(),
+        notes: formData.notes?.trim() || '',
         shippingFee: productShipping,
         shipping: productShipping,
         items: cart.map(item => ({
-          productName: isAr ? PRODUCT.name.ar : PRODUCT.name.en,
-          color: item.colorLabel,
-          size: item.size,
-          quantity: item.quantity,
-          price: item.price
+          productName: item.productName || getSafeText(PRODUCT?.name, isAr, 'منتج'),
+          color: item.colorLabel || 'افتراضي',
+          size: item.size || 'Free Size',
+          quantity: Number(item.quantity) || 1,
+          price: Number(item.price) || Number(PRODUCT?.price) || 0
         }))
       };
 
@@ -198,11 +227,12 @@ export default function ProductLanding({ lang, initialProduct }: { lang: string;
         setCart([]); // Empty the cart
         setFormData({ name: '', phone: '', governorate: '', address: '', notes: '' });
       } else {
-        alert(isAr ? 'حدث خطأ أثناء إرسال الطلب، يرجى المحاولة مرة أخرى.' : 'Error submitting order, please try again.');
+        const errorData = await res.json().catch(() => ({}));
+        alert(errorData.error || (isAr ? 'حدث خطأ أثناء إرسال الطلب، يرجى مراجعة البيانات والمحاولة مرة أخرى.' : 'Error submitting order, please try again.'));
       }
     } catch (err) {
-      console.error(err);
-      alert(isAr ? 'حدث خطأ غير متوقع.' : 'An unexpected error occurred.');
+      console.error("Order submit exception:", err);
+      alert(isAr ? 'حدث خطأ في الاتصال، يرجى المحاولة مرة أخرى.' : 'Network error occurred, please try again.');
     } finally {
       setIsSubmitting(false);
     }
